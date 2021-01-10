@@ -134,7 +134,7 @@ async def зп(ctx):
         money['money'][str(ctx.author.id)]['Money'] = 0
     if not str(ctx.author.id) in queue:
         emb = discord.Embed(
-            description=f'**{ctx.author}** Вы получили свои 150 коина\nСледующее получение будет доступно только через 2 минуты')
+            description=f'**{ctx.author}** Вы получили свои 150 :dollar:\nСледующее получение будет доступно только через 2 минуты')
         await ctx.send(embed=emb)
         money['money'][str(ctx.author.id)]['Money'] += 150
         queue.append(str(ctx.author.id))
@@ -185,7 +185,7 @@ async def магазин(ctx, nam=None):
         emb = discord.Embed(title="Магазин Предметов")
         for user in shop['shop']['item']:
             for item in shop['shop']['item'][str(user)]:
-                emb.add_field(name=f'Товар: {item}\n', value=f'**Цена: {shop["shop"]["item"][str(user)][item]["cost"]}**\nКоличество: {shop["shop"]["item"][str(user)][item]["quant"]}\nВыставил: <@{user}>', inline=False)
+                emb.add_field(name=f'Товар: {item}\n', value=f'**Цена: {shop["shop"]["item"][str(user)][item]["cost"]}** :dollar:\nКоличество: {shop["shop"]["item"][str(user)][item]["quant"]}\nВыставил: <@{user}>', inline=False)
         await ctx.send(embed=emb)
 @bot.command()
 async def купить_роль(ctx, role: discord.Role):
@@ -193,7 +193,7 @@ async def купить_роль(ctx, role: discord.Role):
         money = json.load(f)
     if not str(role.id) in money['shop']['Role']:
         await ctx.send('Такой роли не выставленно в магазине ролей')
-    elif str(role.id) in money['shop']['Role']:
+    else:
         if str(role.id) in money['shop']['Role']:
             if money['shop']['Role'][str(role.id)]['Cost'] <= money['money'][str(ctx.author.id)]['Money']:
                 if not role in ctx.author.roles:
@@ -208,18 +208,20 @@ async def купить_роль(ctx, role: discord.Role):
                         await ctx.send('Вы купили роль!')
                 else:
                     await ctx.send('У вас уже есть эта роль!')
+            else:
+                await ctx.send('У вас недостаточно денег!')
     with open('data.json', 'w') as f:
         json.dump(money, f)
 @bot.command()
 async def купить_предмет(ctx, item, member: discord.Member=None):
     with open('data.json', 'r') as f:
         buyi = json.load(f)
-    if not str(member) in buyi['money']:
+    if not str(ctx.author.id) in buyi['money']:
         buyi['money'][str(ctx.author.id)] = {}
         buyi['money'][str(ctx.author.id)]['Money'] = 0
-    if not str(member) in buyi['money']:
-        buyi['money'][str(member)] = {}
-        buyi['money'][str(member)]['Money'] = 0
+    if not str(member.id) in buyi['money']:
+        buyi['money'][str(member.id)] = {}
+        buyi['money'][str(member.id)]['Money'] = 0
     if not str(member.id) in buyi['shop']['item']:
         emb = discord.Embed(description=f'Комманда введена неккоректно.\nНаберите "**-помощь купить**"')
         await ctx.send(embed=emb)
@@ -234,8 +236,8 @@ async def купить_предмет(ctx, item, member: discord.Member=None):
                 buyi['inv'][str(ctx.author.id)] = {}
             buyi['inv'][str(ctx.author.id)][item] = {}
             buyi['inv'][str(ctx.author.id)][item]['quanti'] = buyi['shop']['item'][str(member.id)][item]['quant']
+            emb = discord.Embed(description=f'Вы купили "{item}" в количестве {buyi["inv"][str(ctx.author.id)][item]["quanti"]} за {buyi["shop"]["item"][str(member.id)][item]["cost"]} :dollar:')
             del buyi['shop']['item'][str(member.id)][item]
-            emb = discord.Embed(description=f'Вы купили "{item}" в количестве {buyi["inv"][str(ctx.author.id)][item]["quanti"]}')
             await ctx.send(embed=emb)
     with open('data.json', 'w') as f:
         json.dump(buyi, f)
@@ -248,7 +250,7 @@ async def заплатить(ctx, why, member: discord.Member, arg: int, name=No
             money['money'][str(member.id)] = {}
             money['money'][str(member.id)]['Money'] = 0
         if money['money'][str(ctx.author.id)]['Money'] >= arg:
-            emb = discord.Embed(description=f'**{ctx.author}** подарил **{member}** **{arg}** монет')
+            emb = discord.Embed(description=f'**{ctx.author}** подарил **{member}** **{arg}** :dollar:')
             money['money'][str(ctx.author.id)]['Money'] -= arg
             money['money'][str(member.id)]['Money'] += arg
             await ctx.send(embed=emb)
@@ -299,7 +301,7 @@ async def лот(ctx, act, name, qu: int = None, cost: int = None):
             await ctx.send(embed=emb)
         else:
             buyi['shop']['item'][str(ctx.author.id)][name]['cost'] = cost
-            emb = discord.Embed(description=f'Цена была изменена\nТеперь она составляет **{buyi["shop"]["item"][str(ctx.author.id)][name]["cost"]} монет**')
+            emb = discord.Embed(description=f'Цена "{name}" была изменена\nТеперь она составляет **{buyi["shop"]["item"][str(ctx.author.id)][name]["cost"]} :dollar:**')
             await ctx.send(embed=emb)
     if act == 'снять' and cost == None:
         if not name in buyi['shop']['item'][str(ctx.author.id)]:
@@ -328,7 +330,7 @@ async def лот(ctx, act, name, qu: int = None, cost: int = None):
                 buyi['shop']['item'][str(ctx.author.id)][name]['cost'] = cost
                 buyi['shop']['item'][str(ctx.author.id)][name]['quant'] = qu
                 emb = discord.Embed(
-                    description=f'Вы выставили на продажу "{qu}" единиц {name} за общую стоимость {cost}')
+                    description=f'Вы выставили на продажу {qu} единиц "{name}" за общую стоимость {cost} :dollar:')
                 await ctx.send(embed=emb)
             if buyi['inv'][str(ctx.author.id)][name]['quanti'] == qu:
                 del buyi['inv'][str(ctx.author.id)][name]
@@ -338,7 +340,7 @@ async def лот(ctx, act, name, qu: int = None, cost: int = None):
                 buyi['shop']['item'][str(ctx.author.id)][name]['cost'] = cost
                 buyi['shop']['item'][str(ctx.author.id)][name]['quant'] = qu
                 emb = discord.Embed(
-                    description=f'Вы выставили на продажу "{qu}" единиц {name} за общую стоимость {cost}')
+                    description=f'Вы выставили на продажу {qu} единиц "{name}" за общую стоимость {cost} :dollar:')
                 await ctx.send(embed=emb)
         else:
             emb = discord.Embed(description=f'Вы пытаетесь выставить предмет, которого нет у вас!')
