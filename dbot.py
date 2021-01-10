@@ -11,6 +11,7 @@ bot = commands.Bot(command_prefix=settings['PREFIX'])
 bot.remove_command('help')
 queue = []
 
+
 #Все функции тут:
 def check_admin(roles: list):
     result = False
