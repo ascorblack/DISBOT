@@ -27,8 +27,10 @@ async def on_ready():
     print('Бот коннект!')
 @bot.event
 async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send(':grimacing: Ой, кажется такой команды не существует')
     if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(':grimacing: Ой, что-то пошло не так...\nВведите "-помощь (команда)"')
+        await ctx.send(':grimacing: Ой, кажется вы пропустили один или несколько аргументов...\nВведите "-помощь (команда)"')
 
 
 #Мини-игры:
@@ -115,6 +117,16 @@ async def аватар(ctx, member: discord.Member = None):
         emb = discord.Embed(title=f'Аватарка {member}')
         emb.set_image(url='{}'.format(member.avatar_url))
         await ctx.send(embed=emb)
+@bot.command()
+async def топ(ctx, member: discord.Member = None):
+    with open('data.json', 'r') as f:
+        top = json.load(f)
+    i = 0
+    emb = discord.Embed(name='Топ пользователей')
+    for user in top['money']:
+        i += 1
+        emb.add_field(name=f'{i} место', value=f'{top["money"][str(user)]["Name"]} - Имеет на своём счету {top["money"][str(user)]["Money"]} :dollar:', inline=False)
+    await ctx.send(embed=emb)
 
 
 #Деньги пользователей
@@ -145,6 +157,7 @@ async def баланс(ctx, member: discord.Member = None):
     if not str(ctx.author.id) in balance['money']:
         balance['money'][str(ctx.author.id)] = {}
         balance['money'][str(ctx.author.id)]['Money'] = 0
+        balance['money'][str(ctx.author.id)]['Name'] = str(ctx.author.name)
         with open('data.json', 'w') as f:
             json.dump(balance, f)
     if member == None:
@@ -156,6 +169,10 @@ async def баланс(ctx, member: discord.Member = None):
         emb.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=emb)
     else:
+        if not str(member.id) in balance['money']:
+            balance['money'][str(member.id)] = {}
+            balance['money'][str(member.id)]['Money'] = 0
+            balance['money'][str(member.id)]['Name'] = str(member.name)
         emb = discord.Embed(description=f'У **{member}** на счету {balance["money"][str(member.id)]["Money"]} :dollar:', color=discord.Colour.dark_green())
         emb.set_author(name=member.name, icon_url=member.avatar_url)
         await ctx.send(embed=emb)
@@ -387,10 +404,9 @@ async def чистка(ctx, amount=5):
 async def шнюк(ctx, k, *, text):
     if check_admin(ctx.author.roles):
         i = 0
-        while i <= int(k):
-            i = i+1
+        while i < int(k):
             await ctx.send(text)
-        exit
+            i += 1
     else:
         emb = discord.Embed(description=f'У вас недостаточно прав!', color=discord.Colour.red())
         await ctx.send(embed=emb)
@@ -506,7 +522,7 @@ async def выставить_роль(ctx, role: discord.Role, cost: int, quant=
                 add['shop']['Role'][str(role.id)] = {}
                 add['shop']['Role'][str(role.id)]['Cost'] = cost
                 add['shop']['Role'][str(role.id)]['Quant'] = quant
-                await ctx.send(':white_check_mark: Роль добавлена в магазин')
+                await ctx.send(f':white_check_mark: Роль добавлена в магазин {role}')
             with open('data.json', 'w') as f:
                 json.dump(add, f)
     else:
@@ -557,6 +573,7 @@ async def добавить_деньги(ctx, qu: int, member: discord.Member = N
                 if not str(ctx.author.id) in money['money']:
                     money['money'][str(ctx.author.id)] = {}
                     money['money'][str(ctx.author.id)]['Money'] = 0
+                    money['money'][str(ctx.author.id)]['Name'] = str(ctx.author.name)
                 if str(member.id) in money['money']:
                     money['money'][str(ctx.author.id)]['Money'] += qu
                     emb = discord.Embed(description=f'Вы добавили на свой счёт {qu} :dollar:', color=discord.Colour.dark_green())
@@ -565,6 +582,7 @@ async def добавить_деньги(ctx, qu: int, member: discord.Member = N
                 if not str(member.id) in money['money']:
                     money['money'][str(member.id)] = {}
                     money['money'][str(member.id)]['Money'] = 0
+                    money['money'][str(member.id)]['Name'] = str(member.name)
                 if str(member.id) in money['money']:
                     money['money'][str(member.id)]['Money'] += qu
                     emb = discord.Embed(description=f'Вы добавили на счёт **{member}** {qu} :dollar:', color=discord.Colour.dark_green())
@@ -587,6 +605,7 @@ async def удалить_деньги(ctx, qu: int, member: discord.Member = Non
                 if not str(ctx.author.id) in money['money']:
                     money['money'][str(ctx.author.id)] = {}
                     money['money'][str(ctx.author.id)]['Money'] = 0
+                    money['money'][str(ctx.author.id)]['Name'] = str(ctx.author.name)
                 if str(member.id) in money['money']:
                     money['money'][str(ctx.author.id)]['Money'] -= qu
                     emb = discord.Embed(description=f'Вы удалили со своего счёта {qu} :dollar:', color=discord.Colour.dark_green())
@@ -595,6 +614,7 @@ async def удалить_деньги(ctx, qu: int, member: discord.Member = Non
                 if not str(member.id) in money['money']:
                     money['money'][str(member.id)] = {}
                     money['money'][str(member.id)]['Money'] = 0
+                    money['money'][str(member.id)]['Name'] = str(member.name)
                 if str(member.id) in money['money']:
                     money['money'][str(member.id)]['Money'] -= qu
                     emb = discord.Embed(description=f'Вы удалили со счёта **{member}** {qu} :dollar:', color=discord.Colour.dark_green())
@@ -607,6 +627,16 @@ async def удалить_деньги(ctx, qu: int, member: discord.Member = Non
     else:
         emb = discord.Embed(description=f':no_entry_sign: У вас недостаточно прав!', color=discord.Colour.red())
         await ctx.send(embed=emb)
-
+# @bot.command()
+# async def prefix(ctx, prefix):
+#     if check_admin(ctx.author.roles):
+#         if prefix != settings['PREFIX']:
+#             language.change(settings['PREFIX'] = prefix)
+#             await ctx.send(f'Вы сменили префикс на {settings['PREFIX']}')
+#         else:
+#             await ctx.send(f'Такой префикс уже используется')
+#     else:
+#         emb = discord.Embed(description=f':no_entry_sign: У вас недостаточно прав!', color=discord.Colour.red())
+#         await ctx.send(embed=emb)
 
 bot.run(settings['TOKEN'])
