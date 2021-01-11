@@ -80,6 +80,13 @@ async def дуэль(ctx, user1, user2):
 
 #Остальные команды:
 @bot.command()
+async def сосу(ctx):
+    rand = random.randint(1, 100)
+    if rand < 50:
+        await ctx.send('Ну и соси :rage:')
+    else:
+        await ctx.send('Не в этот раз :smiling_imp: ')
+@bot.command()
 async def помощь(ctx, help=None):
     if help == 'перестрелка':
         emb = discord.Embed(title='Форма заполнения "-перестрелка":', color=discord.Colour.red(),
