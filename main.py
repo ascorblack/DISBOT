@@ -1,4 +1,4 @@
-import json, operator
+import json
 import re
 import random
 import discord
@@ -7,11 +7,15 @@ from discord.ext.commands import has_permissions
 from config import settings
 import asyncio
 
+with open("data.json") as f:
+    prefixes = json.load(f)
+default_prefix = str(prefixes['prefix'])
+bot = commands.Bot(command_prefix=default_prefix)
+bot.owner_ids = [263708575241601024]
 token = settings['TOKEN']
-bot = commands.Bot(command_prefix=settings['PREFIX'])
 bot.remove_command('help')
 queue = []
-owner_id = 263708575241601024
+
 
 #Все функции тут:
 def check_admin(roles: list):
@@ -58,7 +62,7 @@ async def перестрелка(ctx, user1, user2, ammo1, ammo2):
         chance = 50
         if int(ammo1) - int(ammo2) >= 5 and int(ammo1) - int(ammo2) < 15:
             chance = chance + 15
-        elif int(ammo1) - int(ammo2) >= 15:
+        elif int(ammo1) - int(ammo2) >= 15: 
             chance = chance + 25
         elif int(ammo2) - int(ammo1) >= 5 and int(ammo2) - int(ammo1) < 15:
             chance = chance - 15
@@ -84,7 +88,52 @@ async def дуэль(ctx, user1, user2):
         await ctx.send('Ничья!')
     else:
         await ctx.send('Выиграл ' + user2 + '!')
+@bot.command(name="CookeGame", aliases=["CG", "cg"])
+async def CookeGame(ctx):
+    emb = discord.Embed(title='Игра "Печенька"', color=discord.Colour.orange())
+    emb.add_field(name='Правила', value='Кто первый нажмёт на реакцию - победил!')
+    mess = await ctx.send(embed=emb)
+    tim = random.randint(0, 5)
+    await asyncio.sleep(tim)
+    for i in reversed(range(0, 4)):
+        emb = discord.Embed(title=f'{i}')
+        await mess.edit(embed=emb)
+        tim = random.randint(0, 1)
+        await asyncio.sleep(tim)
+    global message_id
+    emb = discord.Embed(description='**!ЖМИ :cookie: НИЖЕ!**', color=discord.Colour.red())
+    await mess.edit(embed=emb)
+    emoji = '\N{cookie}'
+    await mess.add_reaction(emoji)
+    message_id = mess.id
+    def check(reaction, user):
+        return str(reaction.emoji) == emoji and user != bot.user
+    try:
+        reaction, user = await bot.wait_for('reaction_add', timeout=10, check=check)
+        emb = discord.Embed(description=f'**Выиграл: __{user}__**', color=discord.Colour.gold())
+        await mess.edit(embed=emb) 
+    except asyncio.TimeoutError:
+        emb = discord.Embed(description=f'**Время вышло!\nНикто не поставил реакцию:cry:**', color=discord.Colour.blue())
+        await mess.edit(embed=emb) 
+=======
+@bot.command(name="CookeGame", aliases=["CG", "cg"]) 
+async def CookeGame(ctx): 
+    emb = discord.Embed(title='Игра "Печенька"') 
+    emb.add_field(name='Правила', value='Кто первый нажмёт на реакцию - победил!') 
+    mess = await ctx.send(embed=emb) 
+    await asyncio.sleep(8) 
+    for i in reversed(range(0, 4)): 
+        emb = discord.Embed(title=f'{i}') 
+        await mess.edit(embed=emb) 
+        await asyncio.sleep(1) 
+    emb = discord.Embed(title='Игра "Печенька"') 
+    emb.add_field(name='СТАВЬ СКОРЕЕ РЕАКЦИЮ!', value=None) 
+    await mess.edit(embed=emb) 
+    emoji = discord.utils.get(discord.guild.emoji, name='cookie') 
+    if emoji: 
+         await mess.add_reaction(emoji)
 
+>>>>>>> 68379379a13b05f6287c38e83daee8a517dbab05
 
 #Остальные команды:
 @bot.command()
@@ -132,6 +181,49 @@ async def аватар(ctx, member: discord.Member = None):
         emb = discord.Embed(title=f'Аватарка {member}')
         emb.set_image(url='{}'.format(member.avatar_url))
         await ctx.send(embed=emb)
+@bot.command()
+async def emb(ctx, title, color: discord.Colour, q: int, *, atr):
+    atr = atr.split(', ')
+    n = 0
+    i = 0
+    await ctx.channel.purge(limit=1)
+    emb = discord.Embed(title=f'{title}', color=color)
+    if q > 1:
+        name = 0
+        value = 1
+        inline = 2
+        while i < q:
+            emb.add_field(name=f'{atr[name]}', value=f'{atr[value]}', inline=atr[inline])
+            name += 3
+            value += 3
+            inline += 3
+            i += 1
+        await ctx.send(embed=emb)
+    else:
+        nn = atr[n]
+        nv = atr[n+1]
+        ni = atr[n+2]
+        emb.add_field(name=f'{nn}', value=f'{nv}', inline=ni)
+        await ctx.send(embed=emb)
+    # emb.add_field(name=f'{nn}', value=f'{nv}', inline=ni)
+    # i += 1
+    # await ctx.send(embed=emb)
+@bot.command()
+async def poll(ctx, *, atr):
+    art = atr.split('\n')
+    title = art[0]
+    x = art[0]
+    art.remove(x)
+    des = '\n'.join(art)
+    await ctx.channel.purge(limit=1)
+    emb = discord.Embed(title=f'{title}', description=f'{des}', color=discord.Colour.orange())
+    mess = await ctx.send(embed=emb)
+    for polls in art:
+        if polls.find('='):
+            split = polls.split('=')
+            emoji = split[0].strip()
+            await mess.add_reaction(emoji)
+
 #@bot.command()
 #async def топ(ctx, member: discord.Member = None):
 #    with open('data.json', 'r') as f:
@@ -159,12 +251,6 @@ async def аватар(ctx, member: discord.Member = None):
 
 
 #Деньги пользователей
-@bot.command()
-@commands.is_owner()
-async def say(ctx, *, text):
-    await ctx.channel.purge(limit=1)
-    await ctx.send(text)
-
 @bot.command()
 async def зп(ctx):
     with open('data.json', 'r') as f:
@@ -435,6 +521,11 @@ async def шнюк(ctx, k, *, text):
     while i < int(k):
         await ctx.send(text)
         i += 1
+@bot.command()
+@commands.is_owner()
+async def say(ctx, *, text):
+    await ctx.channel.purge(limit=1)
+    await ctx.send(text)
 @has_permissions(administrator=True)
 async def добавить_предмет(ctx, name, qu: int, member: discord.Member = None):
     with open('data.json', 'r') as f:
@@ -481,7 +572,7 @@ async def добавить_предмет(ctx, name, qu: int, member: discord.Me
             await ctx.send(embed=emb)
     with open('data.json', 'w') as f:
         json.dump(add, f)
-@bot.command()
+@bot.command(aliases=["удалить-предмет"])
 @has_permissions(administrator=True)
 async def удалить_предмет(ctx, name, qu=754325616, member: discord.Member = None):
     with open('data.json', 'r') as f:
@@ -525,6 +616,7 @@ async def удалить_предмет(ctx, name, qu=754325616, member: discord
                 await ctx.send(embed=emb)
     with open('data.json', 'w') as f:
         json.dump(rem, f)
+
 @bot.command()
 @has_permissions(administrator=True)
 async def выставить_роль(ctx, role: discord.Role, cost: int, quant=1):
@@ -575,6 +667,7 @@ async def удалить_роль(ctx, role: discord.Role, quant=None):
                 await ctx.send(':white_check_mark:  ' + str(quant) + ' выставленных слотов роли было удалено из магазина')
             with open('data.json', 'w') as f:
                 json.dump(remove, f)
+
 @bot.command()
 @has_permissions(administrator=True)
 async def добавить_деньги(ctx, qu: int, member: discord.Member = None):
@@ -633,6 +726,7 @@ async def удалить_деньги(ctx, qu: int, member: discord.Member = Non
     else:
         emb = discord.Embed(description=f':no_entry_sign: Вы не можете удалить отрицательно/нулевое количество :dollar:', color=discord.Colour.red())
         await ctx.send(embed=emb)
+
 @bot.command()
 @commands.has_any_role("Повелитель")
 async def ban(ctx, member: discord.User = None, reason = None):
@@ -654,16 +748,19 @@ async def unban(ctx, id: int):
     emb = discord.Embed(description=f'Вы разбанили {user.mention}')
     await ctx.send(embed=emb)
 
-# @bot.command()
-# async def prefix(ctx, prefix):
-#     if check_admin(ctx.author.roles):
-#         if prefix != settings['PREFIX']:
-#             language.change(settings['PREFIX'] = prefix)
-#             await ctx.send(f'Вы сменили префикс на {settings['PREFIX']}')
-#         else:
-#             await ctx.send(f'Такой префикс уже используется')
-#     else:
-#         emb = discord.Embed(description=f':no_entry_sign: У вас недостаточно прав!', color=discord.Colour.red())
-#         await ctx.send(embed=emb)
+@bot.command(aliases=["pxset", "setprefix", "prefixset"])
+@commands.is_owner()
+async def prefix(ctx, prefix):
+    with open('data.json', 'r') as f:
+        pref = json.load(f)
+    if prefix != pref['prefix']:
+        pref['prefix'] = prefix
+        with open('data.json', 'w') as f:
+            json.dump(pref, f)
+        emb = discord.Embed(description=f':white_check_mark: Вы сменили префикс на "**{pref["prefix"]}**"')
+        await ctx.send(embed=emb)
+    else:
+        emb = discord.Embed(description=f':no_entry_sign: Префикс "**{pref["prefix"]}**" уже используется')
+        await ctx.send(embed=emb)
 
 bot.run(settings['TOKEN'])
