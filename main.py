@@ -89,11 +89,11 @@ async def CookeGame(ctx):
     emb = discord.Embed(title='Игра "Печенька"') 
     emb.add_field(name='Правила', value='Кто первый нажмёт на реакцию - победил!') 
     mess = await ctx.send(embed=emb) 
-    await asyncio.sleep(1) 
+    await asyncio.sleep(8) 
     for i in reversed(range(0, 4)): 
         emb = discord.Embed(title=f'{i}') 
         await mess.edit(embed=emb) 
-        await asyncio.sleep(0) 
+        await asyncio.sleep(1) 
     emb = discord.Embed(title='Игра "Печенька"') 
     emb.add_field(name='СТАВЬ СКОРЕЕ РЕАКЦИЮ!', value=None) 
     mess = await ctx.send(embed=emb) 
