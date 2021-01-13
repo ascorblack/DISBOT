@@ -115,22 +115,6 @@ async def CookeGame(ctx):
     except asyncio.TimeoutError:
         emb = discord.Embed(description=f'**Время вышло!\nНикто не поставил реакцию:cry:**', color=discord.Colour.blue())
         await mess.edit(embed=emb)
-@bot.command(name="CookeGame", aliases=["CG", "cg"]) 
-async def CookeGame(ctx): 
-    emb = discord.Embed(title='Игра "Печенька"') 
-    emb.add_field(name='Правила', value='Кто первый нажмёт на реакцию - победил!') 
-    mess = await ctx.send(embed=emb) 
-    await asyncio.sleep(8) 
-    for i in reversed(range(0, 4)): 
-        emb = discord.Embed(title=f'{i}') 
-        await mess.edit(embed=emb) 
-        await asyncio.sleep(1) 
-    emb = discord.Embed(title='Игра "Печенька"') 
-    emb.add_field(name='СТАВЬ СКОРЕЕ РЕАКЦИЮ!', value=None) 
-    await mess.edit(embed=emb) 
-    emoji = discord.utils.get(discord.guild.emoji, name='cookie') 
-    if emoji: 
-         await mess.add_reaction(emoji)
 
 
 #Остальные команды:
