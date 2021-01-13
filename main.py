@@ -96,7 +96,7 @@ async def CookeGame(ctx):
         await asyncio.sleep(1) 
     emb = discord.Embed(title='Игра "Печенька"') 
     emb.add_field(name='СТАВЬ СКОРЕЕ РЕАКЦИЮ!', value=None) 
-    mess = await ctx.send(embed=emb) 
+    await mess.edit(embed=emb) 
     emoji = discord.utils.get(discord.guild.emoji, name='cookie') 
     if emoji: 
          await mess.add_reaction(emoji)
