@@ -52,16 +52,16 @@ async def on_guild_remove(guild):
     with open("data.json", 'w') as f:
         json.dump(pref, f, indent=4)
 
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(':grimacing: Ой, кажется вы пропустили один или несколько аргументов...\nВведите "-помощь (команда)"')
-    if isinstance(error, commands.MissingPermissions):
-        emb = discord.Embed(description=f':no_entry_sign: У вас недостаточно прав!', color=discord.Colour.red())
-        await ctx.send(embed=emb)
-    if isinstance(error, commands.NotOwner):
-        emb = discord.Embed(description=f':no_entry_sign: У вас недостаточно прав!', color=discord.Colour.red())
-        await ctx.send(embed=emb)
+#@bot.event
+#async def on_command_error(ctx, error):
+#    if isinstance(error, commands.MissingRequiredArgument):
+#        await ctx.send(':grimacing: Ой, кажется вы пропустили один или несколько аргументов...\nВведите "-помощь (команда)"')
+#    if isinstance(error, commands.MissingPermissions):
+#        emb = discord.Embed(description=f':no_entry_sign: У вас недостаточно прав!', color=discord.Colour.red())
+#        await ctx.send(embed=emb)
+#    if isinstance(error, commands.NotOwner):
+#        emb = discord.Embed(description=f':no_entry_sign: У вас недостаточно прав!', color=discord.Colour.red())
+#        await ctx.send(embed=emb)
 
 #Мини-игры:
 @bot.command(aliases=["random"])
@@ -322,7 +322,7 @@ async def магазин(ctx, nam=None):
     if nam == 'ролей' or nam == 'роль' or nam == 'role' or nam == 'roles':
         emb = discord.Embed(title="Магазин Ролей")
         for role in shop['shop']['Role']:
-            emb.add_field(name=f'Цена: {shop["shop"]["Role"][role]["Cost"]}', value=f'Роль: <@&{role}>\nКоличество: {shop["shop"]["Role"][role]["Quant"]}', inline=False)
+            emb.add_field(name=f'Цена: {shop["shop"]["Role"][role]["Cost"]} {bot.eco_emoji}', value=f'Роль: <@&{role}>\nКоличество: {shop["shop"]["Role"][role]["Quant"]}', inline=False)
         await ctx.send(embed=emb)
     if nam == 'предметов' or nam == 'предмет' or nam == 'item' or nam == 'items':
         emb = discord.Embed(title="Магазин Предметов")
