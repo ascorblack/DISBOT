@@ -1,41 +1,59 @@
 import json
-import re
 import random
 import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
 from config import settings
 import asyncio
+import sqlite3
 
-with open("data.json") as f:
-    prefixes = json.load(f)
-default_prefix = str(prefixes['prefix'])
-bot = commands.Bot(command_prefix=default_prefix)
+#Функции
+def get_prefix(client, message):
+    with open("data.json", 'r') as f:
+        prefixes = json.load(f)
+    return prefixes['servers'][str(message.guild.id)]['prefix']
+
+bot = commands.Bot(command_prefix=get_prefix)
 bot.owner_ids = [263708575241601024]
 token = settings['TOKEN']
 bot.remove_command('help')
 queue = []
+bot.eco_emoji = ':dollar:'
 
+# РАБОТА С SQLITE3
+# db = sqlite3.connect('data.db')
+# sql = db.cursor()
+# sql.execute("""CREATE TABLE IF NOT EXISTS prefixs (prefix TEXT)""")
+# sql.execute("""CREATE TABLE IF NOT EXISTS lox (loxi TEXT)""")
+# db.commit()
 
-#Все функции тут:
-def check_admin(roles: list):
-    result = False
-    for role in roles:
-        if role.name == 'Ботовод':
-            result = True
-    return result
 
 #Ивенты
 @bot.event
 async def on_ready():
     print('Бот коннект!')
     while True:
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="suggestions"))
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"suggestions"))
+@bot.event
+async def on_guild_join(guild):
+    with open("data.json", 'r') as f:
+        pref = json.load(f)
+    if not 'servers' in pref:
+        pref['servers'] = {}
+    pref['servers'][str(guild.id)] = {}
+    pref['servers'][str(guild.id)]['prefix'] = '-'
+    with open("data.json", 'w') as f:
+        json.dump(pref, f, indent=4)
+@bot.event
+async def on_guild_remove(guild):
+    with open("data.json", 'r') as f:
+        pref = json.load(f)
+    del pref['servers'][str(guild.id)]
+    with open("data.json", 'w') as f:
+        json.dump(pref, f, indent=4)
 
 @bot.event
 async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        await ctx.send(':grimacing: Ой, кажется такой команды не существует')
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(':grimacing: Ой, кажется вы пропустили один или несколько аргументов...\nВведите "-помощь (команда)"')
     if isinstance(error, commands.MissingPermissions):
@@ -46,23 +64,24 @@ async def on_command_error(ctx, error):
         await ctx.send(embed=emb)
 
 #Мини-игры:
-@bot.command()
-async def рандом(text, a, b):
-    if a > b:
-        rand = random.randint(int(b), int(a))
-        await text.send('Выпало число: ' + str(rand))
-        exit
-    elif a == b:
-        await text.send('Невозможно получить число!')
-    else:
-        rand = random.randint(int(a), int(b))
-        await text.send('Выпало число: ' + str(rand))
-@bot.command()
+@bot.command(aliases=["random"])
+async def рандом(ctx, *, arg=None):
+    if arg == None:
+        rand = random.randint(0, 100)
+        emb = discord.Embed(title=f'Выпало число: __{str(rand)}__')
+        await ctx.send(embed=emb)
+    elif arg != None:
+        atr = arg.split('/ ')
+        num = len(atr)
+        rand = random.randint(0, num-1)
+        emb = discord.Embed(title=f'Выпало: __{atr[rand]}__')
+        await ctx.send(embed=emb)
+@bot.command(aliases=["shootout"])
 async def перестрелка(ctx, user1, user2, ammo1, ammo2):
         chance = 50
         if int(ammo1) - int(ammo2) >= 5 and int(ammo1) - int(ammo2) < 15:
             chance = chance + 15
-        elif int(ammo1) - int(ammo2) >= 15: 
+        elif int(ammo1) - int(ammo2) >= 15:
             chance = chance + 25
         elif int(ammo2) - int(ammo1) >= 5 and int(ammo2) - int(ammo1) < 15:
             chance = chance - 15
@@ -78,7 +97,7 @@ async def перестрелка(ctx, user1, user2, ammo1, ammo2):
             await ctx.send('Ничья!')
         else:
             await ctx.send('Выиграл ' + user2 + '!')
-@bot.command()
+@bot.command(aliases=["duel"])
 async def дуэль(ctx, user1, user2):
     await ctx.send('Шансы 50/50')
     win = random.randint(0, 100)
@@ -111,7 +130,7 @@ async def CookeGame(ctx):
     try:
         reaction, user = await bot.wait_for('reaction_add', timeout=10, check=check)
         emb = discord.Embed(description=f'**Выиграл: __{user}__**', color=discord.Colour.gold())
-        await mess.edit(embed=emb) 
+        await mess.edit(embed=emb)
     except asyncio.TimeoutError:
         emb = discord.Embed(description=f'**Время вышло!\nНикто не поставил реакцию:cry:**', color=discord.Colour.blue())
         await mess.edit(embed=emb)
@@ -125,7 +144,7 @@ async def cocy(ctx):
         await ctx.send('Ну и соси :rage:')
     else:
         await ctx.send('Не в этот раз :smiling_imp: ')
-@bot.command()
+@bot.command(aliases=["help"])
 async def помощь(ctx, help=None):
     if help == 'перестрелка':
         emb = discord.Embed(title='Форма заполнения "-перестрелка":', color=discord.Colour.red(),
@@ -142,7 +161,7 @@ async def помощь(ctx, help=None):
         await ctx.send(embed=emb)
     else:
         exit
-@bot.command()
+@bot.command(aliases=["commands"])
 async def команды(ctx):
     retStr = '-дуэль\n-перестрелка\n-рандом'
     retStr2 = '-помощь\n-чистка\n-шнюк\n-стоп\n-аватар'
@@ -154,7 +173,7 @@ async def команды(ctx):
     emb.add_field(name='Остальные команды:', value=retStr2, inline=True)
     emb.add_field(name='Мини-игры:', value=retStr, inline=True)
     await ctx.send(embed=emb)
-@bot.command()
+@bot.command(aliases=["avatar"])
 async def аватар(ctx, member: discord.Member = None):
     if member == None:
         emb = discord.Embed(description=f'Неккоректные данные!')
@@ -164,29 +183,34 @@ async def аватар(ctx, member: discord.Member = None):
         emb.set_image(url='{}'.format(member.avatar_url))
         await ctx.send(embed=emb)
 @bot.command()
-async def emb(ctx, title, color: discord.Colour, q: int, *, atr):
-    atr = atr.split(', ')
-    n = 0
-    i = 0
-    await ctx.channel.purge(limit=1)
-    emb = discord.Embed(title=f'{title}', color=color)
-    if q > 1:
-        name = 0
-        value = 1
-        inline = 2
-        while i < q:
-            emb.add_field(name=f'{atr[name]}', value=f'{atr[value]}', inline=atr[inline])
-            name += 3
-            value += 3
-            inline += 3
-            i += 1
+async def emb(ctx, title, color: discord.Colour = None, q: int = None, *, atr=None):
+    if atr == None and q <= 1:
+        await ctx.channel.purge(limit=1)
+        emb = discord.Embed(title=f'{title}', color=color)
         await ctx.send(embed=emb)
-    else:
-        nn = atr[n]
-        nv = atr[n+1]
-        ni = atr[n+2]
-        emb.add_field(name=f'{nn}', value=f'{nv}', inline=ni)
-        await ctx.send(embed=emb)
+    elif atr != None:
+        atr = atr.split(' / ')
+        n = 0
+        i = 0
+        await ctx.channel.purge(limit=1)
+        emb = discord.Embed(title=f'{title}', color=color)
+        if q > 1:
+            name = 0
+            value = 1
+            inline = 2
+            while i < q:
+                emb.add_field(name=f'{atr[name]}', value=f'{atr[value]}', inline=atr[inline])
+                name += 3
+                value += 3
+                inline += 3
+                i += 1
+            await ctx.send(embed=emb)
+        else:
+            nn = atr[n]
+            nv = atr[n+1]
+            ni = atr[n+2]
+            emb.add_field(name=f'{nn}', value=f'{nv}', inline=ni)
+            await ctx.send(embed=emb)
     # emb.add_field(name=f'{nn}', value=f'{nv}', inline=ni)
     # i += 1
     # await ctx.send(embed=emb)
@@ -201,48 +225,54 @@ async def poll(ctx, *, atr):
     emb = discord.Embed(title=f'{title}', description=f'{des}', color=discord.Colour.orange())
     mess = await ctx.send(embed=emb)
     for polls in art:
-        if polls.find('='):
-            split = polls.split('=')
-            emoji = split[0].strip()
+        if polls.find('-'):
+            poll = polls.split('-')
+            emoji = poll[0].strip()
             await mess.add_reaction(emoji)
-
-#@bot.command()
-#async def топ(ctx, member: discord.Member = None):
-#    with open('data.json', 'r') as f:
-#        top = json.load(f)
-#    i = 0
-#    emb = discord.Embed(name='Топ пользователей')
-#    for user in top['money']:
-#        i += 1
-#        check1 = user
-#        if i == 1:
-#            check = user
-#        if i > 1 and top["money"][str(check1)]["Money"] > top["money"][str(check)]["Money"]:
-#            emb.add_field(name=f'{i-1} место', value=f'{top["money"][str(check1)]["Name"]} - Имеет на своём счету {top["money"][str(check1)]["Money"]} :dollar:', inline=False)
-#            emb.add_field(name=f'{i} место', value=f'{top["money"][str(check)]["Name"]} - Имеет на своём счету {top["money"][str(check)]["Money"]} :dollar:', inline=False)
-#        elif i > 1 and top["money"][str(check1)]["Money"] < top["money"][str(check)]["Money"]:
-#            emb.add_field(name=f'{i-1} место', value=f'{top["money"][str(check)]["Name"]} - Имеет на своём счету {top["money"][str(check)]["Money"]} :dollar:', inline=False)
-#            emb.add_field(name=f'{i} место', value=f'{top["money"][str(check1)]["Name"]} - Имеет на своём счету {top["money"][str(check1)]["Money"]} :dollar:', inline=False)
-#        elif i > 1 and top["money"][str(check1)]["Money"] == top["money"][str(check)]["Money"]:
-#            emb.add_field(name=f'{i} место', value=f'{top["money"][str(check)]["Name"]} - Имеет на своём счету {top["money"][str(check)]["Money"]} :dollar:', inline=False)
-#            emb.add_field(name=f'{i} место', value=f'{top["money"][str(check1)]["Name"]} - Имеет на своём счету {top["money"][str(check1)]["Money"]} :dollar:', inline=False)
-#        else:
-#            pass
-#        check = user
-#    await ctx.send(embed=emb)
+@bot.command(aliases=["top"])
+async def топ(ctx, qua: int = 5):
+    with open('data.json', 'r') as f:
+        top = json.load(f)
+    nam = []
+    mon = []
+    for member in top['money']:
+        nam.append(top['money'][str(member)]['Name'])
+        mon.append(top['money'][str(member)]['Money'])
+    qu = len(nam)
+    if qua > qu:
+        qua = qu
+    mon.sort(reverse=True)
+    i = 0
+    msg = ''
+    while i < qu:
+        for member in top['money']:
+            if i >= qua:
+                i += 1
+                pass
+            elif mon[i] == top['money'][str(member)]['Money']:
+                if i <= 2:
+                    msg += '**{0}. {1} — {2} {3}**\n'.format(i+1, top["money"][str(member)]["Name"], top["money"][str(member)]["Money"], bot.eco_emoji)
+                if i > 2:
+                    msg += '{0}. {1} — {2} {3}\n'.format(i+1, top["money"][str(member)]["Name"], top["money"][str(member)]["Money"], bot.eco_emoji)
+                i += 1
+            else:
+                pass
+    emb = discord.Embed(title=f'Список лидеров {bot.eco_emoji}', description=msg)
+    await ctx.send(embed=emb)
 
 
 #Деньги пользователей
-@bot.command()
+@bot.command(aliases=["wages"])
 async def зп(ctx):
     with open('data.json', 'r') as f:
         money = json.load(f)
     if not str(ctx.author.id) in money['money']:
         money['money'][str(ctx.author.id)] = {}
         money['money'][str(ctx.author.id)]['Money'] = 0
+        money['money'][str(ctx.author.id)]['Name'] = str(ctx.author)
     if not str(ctx.author.id) in queue:
         emb = discord.Embed(
-            description=f'**{ctx.author}** Вы получили свои 150 :dollar:\nСледующее получение будет доступно только через 2 минуты')
+            description=f'**{ctx.author}** Вы получили свои 150 {bot.eco_emoji}\nСледующее получение будет доступно только через 2 минуты')
         await ctx.send(embed=emb)
         money['money'][str(ctx.author.id)]['Money'] += 150
         queue.append(str(ctx.author.id))
@@ -253,54 +283,54 @@ async def зп(ctx):
     if str(ctx.author.id) in queue:
         emb = discord.Embed(description=f'**{ctx.author}** Вы уже получили свою награду')
         await ctx.send(embed=emb)
-@bot.command()
+@bot.command(aliases=["balance", "bal"])
 async def баланс(ctx, member: discord.Member = None):
     with open('data.json', 'r') as f:
         balance = json.load(f)
     if not str(ctx.author.id) in balance['money']:
         balance['money'][str(ctx.author.id)] = {}
         balance['money'][str(ctx.author.id)]['Money'] = 0
-        balance['money'][str(ctx.author.id)]['Name'] = str(ctx.author.name)
+        balance['money'][str(ctx.author.id)]['Name'] = str(ctx.author)
         with open('data.json', 'w') as f:
             json.dump(balance, f)
     if member == None:
-        emb = discord.Embed(description=f'У вас на счету {balance["money"][str(ctx.author.id)]["Money"]} :dollar:', color=discord.Colour.dark_green())
-        emb.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+        emb = discord.Embed(description=f'У вас на счету {balance["money"][str(ctx.author.id)]["Money"]} {bot.eco_emoji}', color=discord.Colour.dark_green())
+        emb.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=emb)
     elif str(member.id) == str(ctx.author.id):
-        emb = discord.Embed(description=f'У вас на счету {balance["money"][str(ctx.author.id)]["Money"]} :dollar:', color=discord.Colour.dark_green())
-        emb.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+        emb = discord.Embed(description=f'У вас на счету {balance["money"][str(ctx.author.id)]["Money"]} {bot.eco_emoji}', color=discord.Colour.dark_green())
+        emb.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=emb)
     else:
         if not str(member.id) in balance['money']:
             balance['money'][str(member.id)] = {}
             balance['money'][str(member.id)]['Money'] = 0
-            balance['money'][str(member.id)]['Name'] = str(member.name)
-        emb = discord.Embed(description=f'У **{member}** на счету {balance["money"][str(member.id)]["Money"]} :dollar:', color=discord.Colour.dark_green())
+            balance['money'][str(member.id)]['Name'] = str(member)
+        emb = discord.Embed(description=f'У **{member}** на счету {balance["money"][str(member.id)]["Money"]} {bot.eco_emoji}', color=discord.Colour.dark_green())
         emb.set_author(name=member.name, icon_url=member.avatar_url)
         await ctx.send(embed=emb)
 
 
 #Магазин ролей/предметов:
-@bot.command()
+@bot.command(aliases=["shop"])
 async def магазин(ctx, nam=None):
     with open('data.json', 'r') as f:
         shop = json.load(f)
     if nam == None:
         emb = discord.Embed(description=f'Выберите магазин, который хотите просмотреть введя:\n"**-магазин ролей**" либо "**-магазин предметов**"')
         await ctx.send(embed=emb)
-    if nam == 'ролей' or nam == 'роль':
+    if nam == 'ролей' or nam == 'роль' or nam == 'role' or nam == 'roles':
         emb = discord.Embed(title="Магазин Ролей")
         for role in shop['shop']['Role']:
             emb.add_field(name=f'Цена: {shop["shop"]["Role"][role]["Cost"]}', value=f'Роль: <@&{role}>\nКоличество: {shop["shop"]["Role"][role]["Quant"]}', inline=False)
         await ctx.send(embed=emb)
-    if nam == 'предметов' or nam == 'предмет':
+    if nam == 'предметов' or nam == 'предмет' or nam == 'item' or nam == 'items':
         emb = discord.Embed(title="Магазин Предметов")
         for user in shop['shop']['item']:
             for item in shop['shop']['item'][str(user)]:
-                emb.add_field(name=f'Товар: {item}\n', value=f'**Цена: {shop["shop"]["item"][str(user)][item]["cost"]}** :dollar:\nКоличество: {shop["shop"]["item"][str(user)][item]["quant"]}\nВыставил: <@{user}>', inline=False)
+                emb.add_field(name=f'Товар: {item}\n', value=f'**Цена: {shop["shop"]["item"][str(user)][item]["cost"]}** {bot.eco_emoji}\nКоличество: {shop["shop"]["item"][str(user)][item]["quant"]}\nВыставил: <@{user}>', inline=False)
         await ctx.send(embed=emb)
-@bot.command()
+@bot.command(aliases=["buy-role", "купить-роль"])
 async def купить_роль(ctx, role: discord.Role):
     with open('data.json', 'r') as f:
         money = json.load(f)
@@ -325,16 +355,18 @@ async def купить_роль(ctx, role: discord.Role):
                 await ctx.send('У вас недостаточно денег!')
     with open('data.json', 'w') as f:
         json.dump(money, f)
-@bot.command()
+@bot.command(aliases=["buy-item", "купить-предмет"])
 async def купить_предмет(ctx, item, member: discord.Member=None):
     with open('data.json', 'r') as f:
         buyi = json.load(f)
     if not str(ctx.author.id) in buyi['money']:
         buyi['money'][str(ctx.author.id)] = {}
         buyi['money'][str(ctx.author.id)]['Money'] = 0
+        buyi['money'][str(ctx.author.id)]['Name'] = str(ctx.author)
     if not str(member.id) in buyi['money']:
         buyi['money'][str(member.id)] = {}
         buyi['money'][str(member.id)]['Money'] = 0
+        buyi['money'][str(member.id)]['Name'] = str(member)
     if not str(member.id) in buyi['shop']['item']:
         emb = discord.Embed(description=f'Комманда введена неккоректно.\nНаберите "**-помощь купить**"')
         await ctx.send(embed=emb)
@@ -349,12 +381,12 @@ async def купить_предмет(ctx, item, member: discord.Member=None):
                 buyi['inv'][str(ctx.author.id)] = {}
             buyi['inv'][str(ctx.author.id)][item] = {}
             buyi['inv'][str(ctx.author.id)][item]['quanti'] = buyi['shop']['item'][str(member.id)][item]['quant']
-            emb = discord.Embed(description=f'Вы купили "{item}" в количестве {buyi["inv"][str(ctx.author.id)][item]["quanti"]} за {buyi["shop"]["item"][str(member.id)][item]["cost"]} :dollar:')
+            emb = discord.Embed(description=f'Вы купили "{item}" в количестве {buyi["inv"][str(ctx.author.id)][item]["quanti"]} за {buyi["shop"]["item"][str(member.id)][item]["cost"]} {bot.eco_emoji}')
             del buyi['shop']['item'][str(member.id)][item]
             await ctx.send(embed=emb)
     with open('data.json', 'w') as f:
         json.dump(buyi, f)
-@bot.command()
+@bot.command(aliases=["pay"])
 async def заплатить(ctx, why, member: discord.Member, arg: int, name=None):
     with open('data.json', 'r') as f:
         money = json.load(f)
@@ -363,7 +395,7 @@ async def заплатить(ctx, why, member: discord.Member, arg: int, name=No
             money['money'][str(member.id)] = {}
             money['money'][str(member.id)]['Money'] = 0
         if money['money'][str(ctx.author.id)]['Money'] >= arg:
-            emb = discord.Embed(description=f'**{ctx.author}** подарил **{member}** **{arg}** :dollar:')
+            emb = discord.Embed(description=f'**{ctx.author}** подарил **{member}** **{arg}** {bot.eco_emoji}')
             money['money'][str(ctx.author.id)]['Money'] -= arg
             money['money'][str(member.id)]['Money'] += arg
             await ctx.send(embed=emb)
@@ -401,22 +433,22 @@ async def заплатить(ctx, why, member: discord.Member, arg: int, name=No
 
 
 #Система инвентаря
-@bot.command()
+@bot.command(aliases=["lot"])
 async def лот(ctx, act, name, qu: int = None, cost: int = None):
     with open('data.json', 'r') as f:
         buyi = json.load(f)
-    if act == 'изменить' and cost != None and qu == None:
+    if (act == 'изменить' or act == 'change') and qu != None and cost == None:
         if not name in buyi['shop']['item'][str(ctx.author.id)]:
             emb = discord.Embed(description=f'Неккоректные данные')
             await ctx.send(embed=emb)
-        if cost == None:
+        if qu == None:
             emb = discord.Embed(description=f'Введите новую цену!')
             await ctx.send(embed=emb)
         else:
-            buyi['shop']['item'][str(ctx.author.id)][name]['cost'] = cost
-            emb = discord.Embed(description=f'Цена "{name}" была изменена\nТеперь она составляет **{buyi["shop"]["item"][str(ctx.author.id)][name]["cost"]} :dollar:**')
+            buyi['shop']['item'][str(ctx.author.id)][name]['cost'] = qu
+            emb = discord.Embed(description=f'Цена "{name}" была изменена\nТеперь она составляет **{buyi["shop"]["item"][str(ctx.author.id)][name]["cost"]} {bot.eco_emoji}**')
             await ctx.send(embed=emb)
-    if act == 'снять' and cost == None:
+    if (act == 'снять' or act == 'del') and qu == None and cost == None:
         if not name in buyi['shop']['item'][str(ctx.author.id)]:
             emb = discord.Embed(description=f'Неккоректные данные')
             await ctx.send(embed=emb)
@@ -425,42 +457,67 @@ async def лот(ctx, act, name, qu: int = None, cost: int = None):
             await ctx.send(embed=emb)
             if not str(ctx.author.id) in buyi['inv']:
                 buyi['inv'][str(ctx.author.id)] = {}
-            buyi['inv'][str(ctx.author.id)] = {}
-            buyi['inv'][str(ctx.author.id)][name] = {}
-            buyi['inv'][str(ctx.author.id)][name]['cost'] = cost
-            del buyi['shop']['item'][str(ctx.author.id)][name]
-    if act == 'выставить' and cost != None and qu != None:
+            if not name in buyi['inv'][str(ctx.author.id)]:
+                buyi['inv'][str(ctx.author.id)][name] = {}
+                buyi['inv'][str(ctx.author.id)][name]['quanti'] = buyi['shop']['item'][str(ctx.author.id)][name]['quant']
+                del buyi['shop']['item'][str(ctx.author.id)][name]
+            else:
+                buyi['inv'][str(ctx.author.id)][name]['quanti'] += buyi['shop']['item'][str(ctx.author.id)][name]['quant']
+                del buyi['shop']['item'][str(ctx.author.id)][name]
+    if (act == 'выставить' or act == 'put') and cost != None and qu != None:
         if name in buyi['inv'][str(ctx.author.id)]:
             if buyi['inv'][str(ctx.author.id)][name]['quanti'] < qu:
                 emb = discord.Embed(description=f'Вы пытаетесь выставить большее кол-во, чем имеете!')
                 await ctx.send(embed=emb)
-                pass
+                exit
             if buyi['inv'][str(ctx.author.id)][name]['quanti'] > qu:
                 buyi['inv'][str(ctx.author.id)][name]['quanti'] -= qu
                 if not str(ctx.author.id) in buyi['shop']['item']:
                     buyi['shop']['item'][str(ctx.author.id)] = {}
-                buyi['shop']['item'][str(ctx.author.id)][name] = {}
-                buyi['shop']['item'][str(ctx.author.id)][name]['cost'] = cost
-                buyi['shop']['item'][str(ctx.author.id)][name]['quant'] = qu
-                emb = discord.Embed(
-                    description=f'Вы выставили на продажу {qu} единиц "{name}" за общую стоимость {cost} :dollar:')
-                await ctx.send(embed=emb)
+                if not name in buyi['shop']['item'][str(ctx.author.id)]:
+                    buyi['shop']['item'][str(ctx.author.id)][name] = {}
+                    buyi['shop']['item'][str(ctx.author.id)][name]['cost'] = cost
+                    buyi['shop']['item'][str(ctx.author.id)][name]['quant'] = qu
+                    emb = discord.Embed(description=f'Вы выставили на продажу {qu} единиц "{name}" за общую стоимость {cost} {bot.eco_emoji}')
+                    await ctx.send(embed=emb)
+                    with open('data.json', 'w') as f:
+                        json.dump(buyi, f)
+                    exit
+                else:
+                    buyi['shop']['item'][str(ctx.author.id)][name]['cost'] += cost
+                    buyi['shop']['item'][str(ctx.author.id)][name]['quant'] += qu
+                    emb = discord.Embed(description=f'Вы добавили на продажу {qu} единиц "{name}" и добавили к стоимости {cost} {bot.eco_emoji}')
+                    await ctx.send(embed=emb)
+                    with open('data.json', 'w') as f:
+                        json.dump(buyi, f)
+                exit
             if buyi['inv'][str(ctx.author.id)][name]['quanti'] == qu:
                 del buyi['inv'][str(ctx.author.id)][name]
                 if not str(ctx.author.id) in buyi['shop']['item']:
                     buyi['shop']['item'][str(ctx.author.id)] = {}
-                buyi['shop']['item'][str(ctx.author.id)][name] = {}
-                buyi['shop']['item'][str(ctx.author.id)][name]['cost'] = cost
-                buyi['shop']['item'][str(ctx.author.id)][name]['quant'] = qu
-                emb = discord.Embed(
-                    description=f'Вы выставили на продажу {qu} единиц "{name}" за общую стоимость {cost} :dollar:')
-                await ctx.send(embed=emb)
+                if not name in buyi['shop']['item'][str(ctx.author.id)]:
+                    buyi['shop']['item'][str(ctx.author.id)][name] = {}
+                    buyi['shop']['item'][str(ctx.author.id)][name]['cost'] = cost
+                    buyi['shop']['item'][str(ctx.author.id)][name]['quant'] = qu
+                    emb = discord.Embed(description=f'Вы выставили на продажу {qu} единиц "{name}" за общую стоимость {cost} {bot.eco_emoji}')
+                    await ctx.send(embed=emb)
+                    with open('data.json', 'w') as f:
+                        json.dump(buyi, f)
+                    exit
+                else:
+                    buyi['shop']['item'][str(ctx.author.id)][name]['cost'] += cost
+                    buyi['shop']['item'][str(ctx.author.id)][name]['quant'] += qu
+                    emb = discord.Embed(description=f'Вы добавили на продажу {qu} единиц "{name}" и добавили к стоимости {cost} {bot.eco_emoji}')
+                    await ctx.send(embed=emb)
+                    with open('data.json', 'w') as f:
+                        json.dump(buyi, f)
+                    exit
         else:
             emb = discord.Embed(description=f'Вы пытаетесь выставить предмет, которого нет у вас!')
             await ctx.send(embed=emb)
     with open('data.json', 'w') as f:
         json.dump(buyi, f)
-@bot.command()
+@bot.command(aliases=["inv"])
 async def инвентарь(ctx, member: discord.Member = None):
     with open('data.json', 'r') as f:
         invs = json.load(f)
@@ -468,7 +525,7 @@ async def инвентарь(ctx, member: discord.Member = None):
         if not str(ctx.author.id) in invs['inv']:
             invs['inv'][str(ctx.author.id)] = {}
         emb = discord.Embed(title='Ваши предметы')
-        emb.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+        emb.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         for inv in invs.copy()['inv'][str(ctx.author.id)]:
             emb.add_field(name=f'Предмет: {inv}', value=f'Количество: {invs["inv"][str(ctx.author.id)][inv]["quanti"]}', inline=False)
         await ctx.send(embed=emb)
@@ -485,29 +542,35 @@ async def инвентарь(ctx, member: discord.Member = None):
 
 
 #Админские комманды
-@bot.command(name='stop', pass_context=True)
+@bot.command(name='stop', aliases=["стоп"], pass_context=True)
 @has_permissions(administrator=True)
 async def stop(ctx):
         await ctx.send('Ну ББ, KEKW')
         await bot.logout()
-@bot.command()
+@bot.command(aliases=["clear"])
 @has_permissions(administrator=True)
 async def чистка(ctx, amount=5):
     await ctx.channel.purge(limit=amount)
     emb = discord.Embed(color=discord.Colour.dark_grey(), description='Было отчищенно ' + str(amount) + ' сообщений!')
     await ctx.send(embed=emb)
-@bot.command()
+@bot.command(aliases=["spam"])
 @commands.has_any_role("Повелитель")
 async def шнюк(ctx, k, *, text):
+    await ctx.channel.purge(limit=1)
     i = 0
     while i < int(k):
         await ctx.send(text)
         i += 1
+@bot.command(aliases=["nuke"])
+@commands.has_any_role("Повелитель")
+async def нюк(ctx):
+    await ctx.send('https://tenor.com/view/destory-eexplode-nuke-gif-6073338')
 @bot.command()
 @commands.is_owner()
 async def say(ctx, *, text):
     await ctx.channel.purge(limit=1)
     await ctx.send(text)
+@bot.command(aliases=["добавить-предмет", "add-item"])
 @has_permissions(administrator=True)
 async def добавить_предмет(ctx, name, qu: int, member: discord.Member = None):
     with open('data.json', 'r') as f:
@@ -554,7 +617,7 @@ async def добавить_предмет(ctx, name, qu: int, member: discord.Me
             await ctx.send(embed=emb)
     with open('data.json', 'w') as f:
         json.dump(add, f)
-@bot.command(aliases=["удалить-предмет"])
+@bot.command(aliases=["удалить-предмет", "del-item"])
 @has_permissions(administrator=True)
 async def удалить_предмет(ctx, name, qu=754325616, member: discord.Member = None):
     with open('data.json', 'r') as f:
@@ -598,8 +661,7 @@ async def удалить_предмет(ctx, name, qu=754325616, member: discord
                 await ctx.send(embed=emb)
     with open('data.json', 'w') as f:
         json.dump(rem, f)
-
-@bot.command()
+@bot.command(aliases=["выставить-роль", "add-role"])
 @has_permissions(administrator=True)
 async def выставить_роль(ctx, role: discord.Role, cost: int, quant=1):
     if quant <= 0:
@@ -617,7 +679,7 @@ async def выставить_роль(ctx, role: discord.Role, cost: int, quant=
             await ctx.send(f':white_check_mark: Роль добавлена в магазин {role}')
         with open('data.json', 'w') as f:
             json.dump(add, f)
-@bot.command()
+@bot.command(aliases=["удалить-роль", "del-role"])
 @has_permissions(administrator=True)
 async def удалить_роль(ctx, role: discord.Role, quant=None):
     if quant == None:
@@ -649,8 +711,7 @@ async def удалить_роль(ctx, role: discord.Role, quant=None):
                 await ctx.send(':white_check_mark:  ' + str(quant) + ' выставленных слотов роли было удалено из магазина')
             with open('data.json', 'w') as f:
                 json.dump(remove, f)
-
-@bot.command()
+@bot.command(aliases=["добавить-деньги", "add-money"])
 @has_permissions(administrator=True)
 async def добавить_деньги(ctx, qu: int, member: discord.Member = None):
     if qu > 0:
@@ -660,26 +721,26 @@ async def добавить_деньги(ctx, qu: int, member: discord.Member = N
             if not str(ctx.author.id) in money['money']:
                 money['money'][str(ctx.author.id)] = {}
                 money['money'][str(ctx.author.id)]['Money'] = 0
-                money['money'][str(ctx.author.id)]['Name'] = str(ctx.author.name)
+                money['money'][str(ctx.author.id)]['Name'] = str(ctx.author)
             if str(member.id) in money['money']:
                 money['money'][str(ctx.author.id)]['Money'] += qu
-                emb = discord.Embed(description=f'Вы добавили на свой счёт {qu} :dollar:', color=discord.Colour.dark_green())
+                emb = discord.Embed(description=f'Вы добавили на свой счёт {qu} {bot.eco_emoji}', color=discord.Colour.dark_green())
                 await ctx.send(embed=emb)
         else:
             if not str(member.id) in money['money']:
                 money['money'][str(member.id)] = {}
                 money['money'][str(member.id)]['Money'] = 0
-                money['money'][str(member.id)]['Name'] = str(member.name)
+                money['money'][str(member.id)]['Name'] = str(member)
             if str(member.id) in money['money']:
                 money['money'][str(member.id)]['Money'] += qu
-                emb = discord.Embed(description=f'Вы добавили на счёт **{member}** {qu} :dollar:', color=discord.Colour.dark_green())
+                emb = discord.Embed(description=f'Вы добавили на счёт **{member}** {qu} {bot.eco_emoji}', color=discord.Colour.dark_green())
                 await ctx.send(embed=emb)
         with open('data.json', 'w') as f:
             json.dump(money, f)
     else:
-        emb = discord.Embed(description=f':no_entry_sign: Вы не можете добавить отрицательно/нулевое количество :dollar:', color=discord.Colour.red())
+        emb = discord.Embed(description=f':no_entry_sign: Вы не можете добавить отрицательно/нулевое количество {bot.eco_emoji}', color=discord.Colour.red())
         await ctx.send(embed=emb)
-@bot.command()
+@bot.command(aliases=["удалить-деньги", "del-money"])
 @has_permissions(administrator=True)
 async def удалить_деньги(ctx, qu: int, member: discord.Member = None):
     if qu > 0:
@@ -689,27 +750,26 @@ async def удалить_деньги(ctx, qu: int, member: discord.Member = Non
             if not str(ctx.author.id) in money['money']:
                 money['money'][str(ctx.author.id)] = {}
                 money['money'][str(ctx.author.id)]['Money'] = 0
-                money['money'][str(ctx.author.id)]['Name'] = str(ctx.author.name)
+                money['money'][str(ctx.author.id)]['Name'] = str(ctx.author)
             if str(member.id) in money['money']:
                 money['money'][str(ctx.author.id)]['Money'] -= qu
-                emb = discord.Embed(description=f'Вы удалили со своего счёта {qu} :dollar:', color=discord.Colour.dark_green())
+                emb = discord.Embed(description=f'Вы удалили со своего счёта {qu} {bot.eco_emoji}', color=discord.Colour.dark_green())
                 await ctx.send(embed=emb)
         else:
             if not str(member.id) in money['money']:
                 money['money'][str(member.id)] = {}
                 money['money'][str(member.id)]['Money'] = 0
-                money['money'][str(member.id)]['Name'] = str(member.name)
+                money['money'][str(member.id)]['Name'] = str(member)
             if str(member.id) in money['money']:
                 money['money'][str(member.id)]['Money'] -= qu
-                emb = discord.Embed(description=f'Вы удалили со счёта **{member}** {qu} :dollar:', color=discord.Colour.dark_green())
+                emb = discord.Embed(description=f'Вы удалили со счёта **{member}** {qu} {bot.eco_emoji}', color=discord.Colour.dark_green())
                 await ctx.send(embed=emb)
         with open('data.json', 'w') as f:
             json.dump(money, f)
     else:
-        emb = discord.Embed(description=f':no_entry_sign: Вы не можете удалить отрицательно/нулевое количество :dollar:', color=discord.Colour.red())
+        emb = discord.Embed(description=f':no_entry_sign: Вы не можете удалить отрицательно/нулевое количество {bot.eco_emoji}', color=discord.Colour.red())
         await ctx.send(embed=emb)
-
-@bot.command()
+@bot.command(aliases=["бан"])
 @commands.has_any_role("Повелитель")
 async def ban(ctx, member: discord.User = None, reason = None):
     mess = member.name
@@ -722,27 +782,36 @@ async def ban(ctx, member: discord.User = None, reason = None):
     emb = discord.Embed(description=f'Вы забанили **{mess}**\n Причина: __{reason}__')
     await ctx.guild.ban(member, reason=reason)
     await ctx.send(embed=emb)
-@bot.command()
+@bot.command(aliases=["разбан"])
 @commands.has_any_role("Повелитель")
 async def unban(ctx, id: int):
     user = await bot.fetch_user(id)
     await ctx.guild.unban(user)
     emb = discord.Embed(description=f'Вы разбанили {user.mention}')
     await ctx.send(embed=emb)
-
-@bot.command(aliases=["pxset", "setprefix", "prefixset"])
+@bot.command(aliases=["setprefix", "prefixset", "pref"])
 @commands.is_owner()
 async def prefix(ctx, prefix):
     with open('data.json', 'r') as f:
         pref = json.load(f)
-    if prefix != pref['prefix']:
-        pref['prefix'] = prefix
+    if prefix != pref['servers'][str(ctx.guild.id)]:
+        pref['servers'][str(ctx.guild.id)]['prefix'] = prefix
         with open('data.json', 'w') as f:
             json.dump(pref, f)
-        emb = discord.Embed(description=f':white_check_mark: Вы сменили префикс на "**{pref["prefix"]}**"')
+        emb = discord.Embed(description=f':white_check_mark: Вы сменили префикс на "**{pref["servers"][str(ctx.guild.id)]["prefix"]}**"')
         await ctx.send(embed=emb)
     else:
-        emb = discord.Embed(description=f':no_entry_sign: Префикс "**{pref["prefix"]}**" уже используется')
+        emb = discord.Embed(description=f':no_entry_sign: Префикс "**{pref["servers"][str(ctx.guild.id)]["prefix"]}**" уже используется')
+        await ctx.send(embed=emb)
+@bot.command(aliases=["ecoemoji"])
+@commands.is_owner()
+async def ecemoji(ctx, emoji):
+    if not emoji == bot.eco_emoji:
+        bot.eco_emoji = emoji
+        emb = discord.Embed(description=f':white_check_mark: Эмодзи валюты был успешно изменён на {bot.eco_emoji} до конца сеанса')
+        await ctx.send(embed=emb)
+    else:
+        emb = discord.Embed(description=f'{bot.eco_emoji} уже используется в качестве обозначения валюты!')
         await ctx.send(embed=emb)
 
 bot.run(settings['TOKEN'])
