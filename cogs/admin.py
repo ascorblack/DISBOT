@@ -286,8 +286,7 @@ class _Admin(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def test(self, ctx, msg):
-        gg = guild_id
-        await ctx.send(gg)
+        await ctx.send(return test(msg))
 
 
 def setup(bot):
