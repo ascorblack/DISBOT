@@ -10,6 +10,6 @@ async def guild_id(ctx):
     guild = str(ctx.guild.id)
     return guild
 
-async def test(ctx, msg):
+async def _test(ctx, msg):
     msg += " да"
     return msg
