@@ -5,6 +5,7 @@ from discord.ext import commands
 from discord.ext.commands import has_permissions
 import asyncio
 from funcs import guild_id
+from funcs import test
 
 
 class _Admin(commands.Cog):
