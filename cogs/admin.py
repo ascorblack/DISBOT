@@ -287,7 +287,7 @@ class _Admin(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def test(self, ctx, msg):
-        await ctx.send(test(msg))
+        await ctx.send(_test(msg))
 
 
 def setup(bot):
