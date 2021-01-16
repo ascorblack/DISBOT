@@ -130,7 +130,7 @@ class _Other_(commands.Cog):
     @commands.command()
     async def last(self, ctx, member: discord.Member = None):
         mess = await last_mess(ctx, member)
-        await ctx.send(f'Ваше последнее сообщение: {mess}')
+        await ctx.send(f'Ваше последнее сообщение: {mess.content}')
 
 
     @poll.error
