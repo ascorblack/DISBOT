@@ -4,16 +4,16 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
 import asyncio
+from funcs import *
 
 
-
-class _Inv(commands.Cog):
+class _Inventory_(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["lot"])
-    async def лот(self, ctx, act, name, qu: int = None, cost: int = None):
+    @commands.command(aliases=["лот"])
+    async def lot(self, ctx, act, name, qu: int = None, cost: int = None):
         with open('cogs/data.json', 'r') as f:
             buyi = json.load(f)
         if (act == 'изменить' or act == 'change') and qu != None and cost == None:
@@ -96,8 +96,8 @@ class _Inv(commands.Cog):
                 await ctx.send(embed=emb)
         with open('cogs/data.json', 'w') as f:
             json.dump(buyi, f)
-    @commands.command(aliases=["inv"])
-    async def инвентарь(self, ctx, member: discord.Member = None):
+    @commands.command(aliases=["inv", "инвентарь"])
+    async def inventory(self, ctx, member: discord.Member = None):
         with open('cogs/data.json', 'r') as f:
             invs = json.load(f)
         if member == None or str(member.id) == str(ctx.author.id):
@@ -120,5 +120,11 @@ class _Inv(commands.Cog):
             json.dump(invs, f)
 
 
+    @lot.error
+    async def lot_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'лот/lot <изменить/change> <item name> <new cost for lot>\nлот/lot <снять/del> <item name>\nлот/lot <выставить/put> <item name> <cost> <quantity>'
+            await get_error(ctx, error, synt)
+
 def setup(bot):
-    bot.add_cog(_Inv(bot))
+    bot.add_cog(_Inventory_(bot))

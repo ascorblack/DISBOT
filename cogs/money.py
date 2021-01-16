@@ -7,13 +7,13 @@ import asyncio
 
 
 
-class _Money(commands.Cog):
+class _Money_(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["wages"])
-    async def зп(self, ctx):
+    @commands.command(aliases=["зп"])
+    async def wages(self, ctx):
         with open('cogs/data.json', 'r') as f:
             money = json.load(f)
         if not str(ctx.author.id) in money['money']:
@@ -33,8 +33,8 @@ class _Money(commands.Cog):
         if str(ctx.author.id) in queue:
             emb = discord.Embed(description=f'**{ctx.author}** Вы уже получили свою награду')
             await ctx.send(embed=emb)
-    @commands.command(aliases=["balance", "bal"])
-    async def баланс(self, ctx, member: discord.Member = None):
+    @commands.command(aliases=["баланс", "bal"])
+    async def balance(self, ctx, member: discord.Member = None):
         with open('cogs/data.json', 'r') as f:
             balance = json.load(f)
         if not str(ctx.author.id) in balance['money']:
@@ -62,4 +62,4 @@ class _Money(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(_Money(bot))
+    bot.add_cog(_Money_(bot))

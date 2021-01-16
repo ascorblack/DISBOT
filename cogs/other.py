@@ -4,10 +4,11 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
 import asyncio
+from funcs import *
 
 
 
-class _Other(commands.Cog):
+class _Other_(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -19,37 +20,29 @@ class _Other(commands.Cog):
             await ctx.send('Ну и соси :rage:')
         else:
             await ctx.send('Не в этот раз :smiling_imp: ')
-    @commands.command(aliases=["help"])
-    async def помощь(self, ctx, help=None):
-        if help == 'перестрелка':
-            emb = discord.Embed(title='Форма заполнения "-перестрелка":', color=discord.Colour.red(),
-                        description='\nЕСЛИ НУЖНО, ЧТОБЫ ИМЯ СОДЕРЖАЛО БОЛЬШЕ ОДНОГО СЛОВА,Т.Е. ИМЕЛО ПРОБЕЛ, НУЖНО ЗАКЛЮЧИТЬ В __**КАВЫЧКИ**__! ("Джо Байден")'
-                    '\n\n-перестрелка (Имя 1-ого игрока) (Имя 2-ого игрока) (Кол-во патронов 1-ого Игрока) (Кол-во патронов 2-ого Игрока)'
-                    '\n\n**Правила увеличения шанса:**\nЕсли у игрока N патронов больше на 5-14, то его шанс выиграть увеличивается на 15%, если же разница больше 15, то на 25%')
-            await ctx.send(embed=emb)
-        elif help == 'шнюк':
-            emb = discord.Embed(title='Инструкция по спам шнюку:', color=discord.Colour.dark_gold(), description='\n-шнюк (кол-во повторений) (любой текст)')
-            await ctx.send(embed=emb)
-        elif help == 'дуэль':
-            emb = discord.Embed(title='Инструкция по комманде "-дуэль":', color=discord.Colour.blurple(), description='\n-дуэль (Имя 1-ого игрока) (Имя 2-ого игрока)'
-                        '\n\nЕСЛИ НУЖНО, ЧТОБЫ ИМЯ СОДЕРЖАЛО БОЛЬШЕ ОДНОГО СЛОВА,Т.Е. ИМЕЛО ПРОБЕЛ, НУЖНО ЗАКЛЮЧИТЬ В __**КАВЫЧКИ**__! ("Джо Байден")')
-            await ctx.send(embed=emb)
-        else:
-            exit
-    @commands.command(aliases=["commands"])
-    async def команды(self, ctx):
-        retStr = '-дуэль\n-перестрелка\n-рандом'
-        retStr2 = '-помощь\n-чистка\n-шнюк\n-стоп\n-аватар'
-        retStr3 = '-баланс\n-зп\n-купить_роль\n-заплатить'
-        retStr4 = '-инвентарь\n-купить/передать_предмет\n-лот выставить/снять/изменить'
-        emb = discord.Embed(title='Доступные команды:', color=discord.Colour.orange())
-        emb.add_field(name='Действия с предметами:', value=retStr4, inline=True)
-        emb.add_field(name='Действия балансом:', value=retStr3, inline=True)
-        emb.add_field(name='Остальные команды:', value=retStr2, inline=True)
-        emb.add_field(name='Мини-игры:', value=retStr, inline=True)
-        await ctx.send(embed=emb)
-    @commands.command(aliases=["avatar"])
-    async def аватар(self, ctx, member: discord.Member = None):
+    # @commands.command(aliases=["help"])
+    # async def помощь(self, ctx, command=None):
+    #     if command != None:
+    #         out = await 
+    #         emb = discord.Embed(color=discord.Colour.dark_gold(), description=f'{out}')
+    #         await ctx.send(embed=emb)
+        # if help == 'перестрелка':
+        #     emb = discord.Embed(title='Форма заполнения "-перестрелка":', color=discord.Colour.red(),
+        #                 description='\nЕСЛИ НУЖНО, ЧТОБЫ ИМЯ СОДЕРЖАЛО БОЛЬШЕ ОДНОГО СЛОВА,Т.Е. ИМЕЛО ПРОБЕЛ, НУЖНО ЗАКЛЮЧИТЬ В __**КАВЫЧКИ**__! ("Джо Байден")'
+        #             '\n\n-перестрелка (Имя 1-ого игрока) (Имя 2-ого игрока) (Кол-во патронов 1-ого Игрока) (Кол-во патронов 2-ого Игрока)'
+        #             '\n\n**Правила увеличения шанса:**\nЕсли у игрока N патронов больше на 5-14, то его шанс выиграть увеличивается на 15%, если же разница больше 15, то на 25%')
+        #     await ctx.send(embed=emb)
+        # elif help == 'шнюк':
+        #     emb = discord.Embed(title='Инструкция по спам шнюку:', color=discord.Colour.dark_gold(), description='\n-шнюк (кол-во повторений) (любой текст)')
+        #     await ctx.send(embed=emb)
+        # elif help == 'дуэль':
+        #     emb = discord.Embed(title='Инструкция по комманде "-дуэль":', color=discord.Colour.blurple(), description='\n-дуэль (Имя 1-ого игрока) (Имя 2-ого игрока)'
+        #                 '\n\nЕСЛИ НУЖНО, ЧТОБЫ ИМЯ СОДЕРЖАЛО БОЛЬШЕ ОДНОГО СЛОВА,Т.Е. ИМЕЛО ПРОБЕЛ, НУЖНО ЗАКЛЮЧИТЬ В __**КАВЫЧКИ**__! ("Джо Байден")')
+        #     await ctx.send(embed=emb)
+        # else:
+        #     exit
+    @commands.command(aliases=["аватар"])
+    async def avatar(self, ctx, member: discord.Member = None):
         if member == None:
             emb = discord.Embed(description=f'Неккоректные данные!')
             await ctx.send(embed=emb)
@@ -104,8 +97,8 @@ class _Other(commands.Cog):
                 poll = polls.split('-')
                 emoji = poll[0].strip()
                 await mess.add_reaction(emoji)
-    @commands.command(aliases=["top"])
-    async def топ(self, ctx, qua: int = 5):
+    @commands.command(aliases=["топ"])
+    async def top(self, ctx, quanti: int = 5):
         with open('cogs/data.json', 'r') as f:
             top = json.load(f)
         nam = []
@@ -114,14 +107,14 @@ class _Other(commands.Cog):
             nam.append(top['money'][str(member)]['Name'])
             mon.append(top['money'][str(member)]['Money'])
         qu = len(nam)
-        if qua > qu:
-            qua = qu
+        if quanti > qu:
+            quanti = qu
         mon.sort(reverse=True)
         i = 0
         msg = ''
         while i < qu:
             for member in top['money']:
-                if i >= qua:
+                if i >= quanti:
                     i += 1
                     pass
                 elif mon[i] == top['money'][str(member)]['Money']:
@@ -134,7 +127,23 @@ class _Other(commands.Cog):
                     pass
         emb = discord.Embed(title=f'Список лидеров {self.bot.eco_emoji}', description=msg)
         await ctx.send(embed=emb)
+    @commands.command()
+    async def last(self, ctx, member: discord.Member = None):
+        mess = await last_mess(ctx, member)
+        await ctx.send(f'Ваше последнее сообщение: {mess}')
+
+
+    @poll.error
+    async def poll_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'poll <title>\nemoji - text\nemoji - text\n...'
+            await get_error(ctx, error, synt)
+    @emb.error
+    async def emb_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'emb <title> <color> <quantity of fields> name / text / inline: true(false) / name / text / inline: true(false) / .......'
+            await get_error(ctx, error, synt)
 
 
 def setup(bot):
-    bot.add_cog(_Other(bot))
+    bot.add_cog(_Other_(bot))

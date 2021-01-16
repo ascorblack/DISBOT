@@ -4,15 +4,15 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
 import asyncio
+from funcs import *
 
-
-class _Minig(commands.Cog):
+class _Minigames_(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["random"])
-    async def рандом(self, ctx, *, arg=None):
+    @commands.command(aliases=["рандом"])
+    async def random(self, ctx, *, arg=None):
         if arg == None:
             rand = random.randint(0, 100)
             emb = discord.Embed(title=f'Выпало число: __{str(rand)}__')
@@ -23,8 +23,8 @@ class _Minig(commands.Cog):
             rand = random.randint(0, num-1)
             emb = discord.Embed(title=f'Выпало: __{atr[rand]}__')
             await ctx.send(embed=emb)
-    @commands.command(aliases=["shootout"])
-    async def перестрелка(self, ctx, user1, user2, ammo1, ammo2):
+    @commands.command(aliases=["перестрелка"])
+    async def shootout(self, ctx, user1, user2, ammo1, ammo2):
             chance = 50
             if int(ammo1) - int(ammo2) >= 5 and int(ammo1) - int(ammo2) < 15:
                 chance = chance + 15
@@ -44,8 +44,8 @@ class _Minig(commands.Cog):
                 await ctx.send('Ничья!')
             else:
                 await ctx.send('Выиграл ' + user2 + '!')
-    @commands.command(aliases=["duel"])
-    async def дуэль(self, ctx, user1, user2):
+    @commands.command(aliases=["дуэль"])
+    async def duel(self, ctx, user1, user2):
         await ctx.send('Шансы 50/50')
         win = random.randint(0, 100)
         if win < 50:
@@ -83,5 +83,18 @@ class _Minig(commands.Cog):
             await mess.edit(embed=emb)
 
 
+    @shootout.error
+    async def shootout_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'shootout/перестрелка (Имя 1-ого игрока) (Имя 2-ого игрока) (Кол-во патронов 1-ого Игрока) (Кол-во патронов 2-ого Игрока)'
+            await get_error(ctx, error, synt)
+    @duel.error
+    async def duel_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'duel "Name 1" "Name 2"'
+            await get_error(ctx, error, synt)
+
+
+
 def setup(bot):
-    bot.add_cog(_Minig(bot))
+    bot.add_cog(_Minigames_(bot))

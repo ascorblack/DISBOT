@@ -4,34 +4,37 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
 import asyncio
+from funcs import *
 
 
-
-class _Shop(commands.Cog):
+class _Shop_(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
         
-    @commands.command(aliases=["shop"])
-    async def магазин(self, ctx, nam=None):
+    @commands.command(aliases=["магазин"])
+    async def shop(self, ctx, name=None):
         with open('cogs/data.json', 'r') as f:
             shop = json.load(f)
-        if nam == None:
-            emb = discord.Embed(description=f'Выберите магазин, который хотите просмотреть введя:\n"**-магазин ролей**" либо "**-магазин предметов**"')
+        if name == None:
+            emb = discord.Embed(description=f'Выберите магазин, который хотите просмотреть введя:\n"**-магазин/shop ролей/role**" либо "**-магазин/shop предметов/item**"')
             await ctx.send(embed=emb)
-        if nam == 'ролей' or nam == 'роль' or nam == 'role' or nam == 'roles':
+        elif name == 'ролей' or name == 'роль' or name == 'role' or name == 'roles':
             emb = discord.Embed(title="Магазин Ролей")
             for role in shop['shop']['Role']:
                 emb.add_field(name=f'Цена: {shop["shop"]["Role"][role]["Cost"]}', value=f'Роль: <@&{role}>\nКоличество: {shop["shop"]["Role"][role]["Quant"]}', inline=False)
             await ctx.send(embed=emb)
-        if nam == 'предметов' or nam == 'предмет' or nam == 'item' or nam == 'items':
+        elif name == 'предметов' or name == 'предмет' or name == 'item' or name == 'items':
             emb = discord.Embed(title="Магазин Предметов")
             for user in shop['shop']['item']:
                 for item in shop['shop']['item'][str(user)]:
                     emb.add_field(name=f'Товар: {item}\n', value=f'**Цена: {shop["shop"]["item"][str(user)][item]["cost"]}** {self.bot.eco_emoji}\nКоличество: {shop["shop"]["item"][str(user)][item]["quant"]}\nВыставил: <@{user}>', inline=False)
             await ctx.send(embed=emb)
+        else:
+            emb = discord.Embed(description=f'Выберите магазин, который хотите просмотреть введя:\n"**-магазин/shop ролей/role**" либо "**-магазин/shop предметов/item**"')
+            await ctx.send(embed=emb)
     @commands.command(aliases=["buy-role", "купить-роль"])
-    async def купить_роль(self, ctx, role: discord.Role):
+    async def buyrole(self, ctx, role: discord.Role):
         with open('cogs/data.json', 'r') as f:
             money = json.load(f)
         if not str(role.id) in money['shop']['Role']:
@@ -56,7 +59,7 @@ class _Shop(commands.Cog):
         with open('cogs/data.json', 'w') as f:
             json.dump(money, f)
     @commands.command(aliases=["buy-item", "купить-предмет"])
-    async def купить_предмет(self, ctx, item, member: discord.Member=None):
+    async def buyitem(self, ctx, item, member: discord.Member=None):
         with open('cogs/data.json', 'r') as f:
             buyi = json.load(f)
         if not str(ctx.author.id) in buyi['money']:
@@ -86,11 +89,11 @@ class _Shop(commands.Cog):
                 await ctx.send(embed=emb)
         with open('cogs/data.json', 'w') as f:
             json.dump(buyi, f)
-    @commands.command(aliases=["pay"])
-    async def заплатить(self, ctx, why, member: discord.Member, arg: int, name=None):
+    @commands.command(aliases=["передать", "transfer", "trans"])
+    async def give(self, ctx, what, member: discord.Member, arg: int, name=None):
         with open('cogs/data.json', 'r') as f:
             money = json.load(f)
-        if why == 'деньги' and name == None:
+        if what == 'деньги' and name == None:
             if not str(member.id) in money['money']:
                 money['money'][str(member.id)] = {}
                 money['money'][str(member.id)]['Money'] = 0
@@ -101,7 +104,7 @@ class _Shop(commands.Cog):
                 await ctx.send(embed=emb)
             else:
                 await ctx.send('У вас недостаточно денег')
-        elif why == 'предмет' and name != None:
+        elif what == 'предмет' and name != None:
             if not str(member.id) in money['inv']:
                 money['inv'][str(member.id)] = {}
             if name in money['inv'][str(ctx.author.id)]:
@@ -132,5 +135,21 @@ class _Shop(commands.Cog):
             json.dump(money, f)
 
 
+    @buyrole.error
+    async def buyrole_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'buy-role/buyrole <@Role>'
+            await get_error(ctx, error, synt)
+    @buyitem.error
+    async def buyitem_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'buy-item/buyitem <item-name> <@member>'
+            await get_error(ctx, error, synt)
+    @give.error
+    async def give_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'give/trans <item/money> <@member> <qunatity> (If item: name-item)'
+            await get_error(ctx, error, synt)
+
 def setup(bot):
-    bot.add_cog(_Shop(bot))
+    bot.add_cog(_Shop_(bot))

@@ -4,10 +4,10 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
 import asyncio
-from funcs import guild_id
+from funcs import *
 
 
-class _Admin(commands.Cog):
+class _Admin_(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -17,32 +17,35 @@ class _Admin(commands.Cog):
     async def stop(self, ctx):
             await ctx.send('Ну ББ, KEKW')
             await self.bot.logout()
-    @commands.command(aliases=["clear"])
+    @commands.command(aliases=["чистка"])
     @has_permissions(administrator=True)
-    async def чистка(self, ctx, amount=5):
+    async def clear(self, ctx, amount=5):
         await ctx.channel.purge(limit=amount)
         emb = discord.Embed(color=discord.Colour.dark_grey(), description='Было отчищенно ' + str(amount) + ' сообщений!')
         await ctx.send(embed=emb)
     @commands.command(aliases=["spam"])
     @commands.has_any_role("Повелитель")
     async def шнюк(self, ctx, k, *, text):
-        await ctx.channel.purge(limit=1)
+        mess = await get_last_mess(ctx, member = None)
+        await mess.delete()
         i = 0
         while i < int(k):
             await ctx.send(text)
             i += 1
-    @commands.command(aliases=["nuke"])
+    @commands.command(aliases=["нюк"])
     @commands.has_any_role("Повелитель")
-    async def нюк(self, ctx):
+    async def nuke(self, ctx):
         await ctx.send('https://tenor.com/view/destory-eexplode-nuke-gif-6073338')
     @commands.command()
     @commands.is_owner()
     async def say(self, ctx, *, text):
-        await ctx.channel.purge(limit=1)
-        await ctx.send(text)
+        if not text == None:
+            mess = await last_mess(ctx, member = None)
+            await mess.delete()
+            await ctx.send(text)
     @commands.command(aliases=["добавить-предмет", "add-item"])
     @has_permissions(administrator=True)
-    async def добавить_предмет(self, ctx, name, qu: int, member: discord.Member = None):
+    async def additem(self, ctx, name, qu: int, member: discord.Member = None):
         with open('cogs/data.json', 'r') as f:
             add = json.load(f)
         if member == None or str(member.id) == str(ctx.author.id):
@@ -89,7 +92,7 @@ class _Admin(commands.Cog):
             json.dump(add, f)
     @commands.command(aliases=["удалить-предмет", "del-item"])
     @has_permissions(administrator=True)
-    async def удалить_предмет(self, ctx, name, qu=754325616, member: discord.Member = None):
+    async def delitem(self, ctx, name, qu=754325616, member: discord.Member = None):
         with open('cogs/data.json', 'r') as f:
             rem = json.load(f)
         if member == None or str(member.id) == str(ctx.author.id):
@@ -131,9 +134,9 @@ class _Admin(commands.Cog):
                     await ctx.send(embed=emb)
         with open('cogs/data.json', 'w') as f:
             json.dump(rem, f)
-    @commands.command(aliases=["выставить-роль", "add-role"])
+    @commands.command(aliases=["выставить-роль", "shop-add-role", "sar"])
     @has_permissions(administrator=True)
-    async def выставить_роль(self, ctx, role: discord.Role, cost: int, quant=1):
+    async def shopaddrole(self, ctx, role: discord.Role, cost: int, quant=1):
         if quant <= 0:
             await ctx.send(':no_entry_sign: Невозможно выставить отрицательное/нулеовое кол-во слотов!')
             pass
@@ -149,9 +152,9 @@ class _Admin(commands.Cog):
                 await ctx.send(f':white_check_mark: Роль добавлена в магазин {role}')
             with open('cogs/data.json', 'w') as f:
                 json.dump(add, f)
-    @commands.command(aliases=["удалить-роль", "del-role"])
+    @commands.command(aliases=["удалить-роль", "shop-del-role", "sdr"])
     @has_permissions(administrator=True)
-    async def удалить_роль(self, ctx, role: discord.Role, quant=None):
+    async def shopdelrole(self, ctx, role: discord.Role, quant=None):
         if quant == None:
             with open('cogs/data.json', 'r') as f:
                 remove = json.load(f)
@@ -183,7 +186,7 @@ class _Admin(commands.Cog):
                     json.dump(remove, f)
     @commands.command(aliases=["добавить-деньги", "add-money"])
     @has_permissions(administrator=True)
-    async def добавить_деньги(self, ctx, qu: int, member: discord.Member = None):
+    async def addmoney(self, ctx, qu: int, member: discord.Member = None):
         if qu > 0:
             with open('cogs/data.json', 'r') as f:
                 money = json.load(f)
@@ -212,7 +215,7 @@ class _Admin(commands.Cog):
             await ctx.send(embed=emb)
     @commands.command(aliases=["удалить-деньги", "del-money"])
     @has_permissions(administrator=True)
-    async def удалить_деньги(self, ctx, qu: int, member: discord.Member = None):
+    async def delmoney(self, ctx, qu: int, member: discord.Member = None):
         if qu > 0:
             with open('cogs/data.json', 'r') as f:
                 money = json.load(f)
@@ -241,8 +244,8 @@ class _Admin(commands.Cog):
             await ctx.send(embed=emb)
     @commands.command(aliases=["бан"])
     @commands.has_any_role("Повелитель")
-    async def ban(self, ctx, member: discord.User = None, reason = None):
-        mess = member.name
+    async def ban(self, ctx, member: discord.Member = None, reason = None):
+        mess = str(member)
         if member == None or str(member.id) == str(ctx.author.id):
             emb = discord.Embed(description=f'<@{ctx.author.id}> Дурак совсем?')
             await ctx.send(embed=emb)
@@ -259,19 +262,20 @@ class _Admin(commands.Cog):
         await ctx.guild.unban(user)
         emb = discord.Embed(description=f'Вы разбанили {user.mention}')
         await ctx.send(embed=emb)
-    @commands.command(aliases=["setprefix", "prefixset", "pref"])
+    @commands.command(aliases=["prefix", "prefixset", "pref"])
     @commands.is_owner()
-    async def prefix(self, ctx, prefix):
+    async def setprefix(self, ctx, prefix):
+        gui = await get_guild_id(ctx)
         with open('cogs/data.json', 'r') as f:
             pref = json.load(f)
-        if prefix != pref['servers'][str(ctx.guild.id)]:
-            pref['servers'][str(ctx.guild.id)]['prefix'] = prefix
+        if prefix != pref['servers'][gui]:
+            pref['servers'][gui]['prefix'] = prefix
             with open('cogs/data.json', 'w') as f:
                 json.dump(pref, f)
-            emb = discord.Embed(description=f':white_check_mark: Вы сменили префикс на "**{pref["servers"][str(ctx.guild.id)]["prefix"]}**"')
+            emb = discord.Embed(description=f':white_check_mark: Вы сменили префикс на "**{pref["servers"][gui]["prefix"]}**"')
             await ctx.send(embed=emb)
         else:
-            emb = discord.Embed(description=f':no_entry_sign: Префикс "**{pref["servers"][str(ctx.guild.id)]["prefix"]}**" уже используется')
+            emb = discord.Embed(description=f':no_entry_sign: Префикс "**{pref["servers"][gui]["prefix"]}**" уже используется')
             await ctx.send(embed=emb)
     @commands.command(aliases=["ecoemoji"])
     @commands.is_owner()
@@ -283,12 +287,68 @@ class _Admin(commands.Cog):
         else:
             emb = discord.Embed(description=f'{self.bot.eco_emoji} уже используется в качестве обозначения валюты!')
             await ctx.send(embed=emb)
-    @commands.command()
+    @commands.command(aliases=["guild-id"])
     @commands.is_owner()
-    async def test(self, ctx, msg):
-        gg = guild_id
-        await ctx.send(gg)
+    async def guildid(self, ctx):
+        result = await get_guild_id(ctx)
+        await ctx.send(result)
 
+
+    @say.error
+    async def say_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'say <text>'
+            await get_error(ctx, error, synt)
+    @шнюк.error
+    async def шнюк_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'шнюк/nuke <quanti> <text>'
+            await get_error(ctx, error, synt)
+    @additem.error
+    async def additem_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'add-item/additem <name> <quanti> <@member>'
+            await get_error(ctx, error, synt)
+    @delitem.error
+    async def delitem_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'del-item/delitem <name> <quanti> <@member>'
+            await get_error(ctx, error, synt)
+    @addmoney.error
+    async def addmoney_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'addmoney/add-money <quanti> <@member>'
+            await get_error(ctx, error, synt)
+    @ban.error
+    async def ban_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument) or isinstance(error, commands.CommandInvokeError):
+            synt = 'ban <@member> <reason>'
+            await get_error(ctx, error, synt)
+    @delmoney.error
+    async def delmoney_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'delmoney/del-money <quanti> <@member>'
+            await get_error(ctx, error, synt)
+    @setprefix.error
+    async def setprefix_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'prefix/set-prefix/setprefix <new prefix>'
+            await get_error(ctx, error, synt)
+    @shopaddrole.error
+    async def shopaddrole_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'shop-add-role/sar/shopaddrole <@ROLE> <count> <quanti>'
+            await get_error(ctx, error, synt)
+    @shopdelrole.error
+    async def shopdelrole_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'shop-del-role/sdr/shopdelrole <@ROLE> <count>'
+            await get_error(ctx, error, synt)
+    @unban.error
+    async def unban_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            synt = 'unban <USER_ID>'
+            await get_error(ctx, error, synt)
 
 def setup(bot):
-    bot.add_cog(_Admin(bot))
+    bot.add_cog(_Admin_(bot))
