@@ -33,7 +33,7 @@ class Help(commands.Cog):
                     if not co.hidden:
                         comms += f'`{co.name}`  '
                     else:
-                        comms += '`**скрыто**`'
+                        comms += '`**скрыто**` '
                 emb.add_field(name=f'__{cogl[i]}__', value=f'{comms}', inline=False)
                 comms = ''
                 i += 1
