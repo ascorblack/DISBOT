@@ -4,8 +4,8 @@ import random
 import discord
 import os
 from glob import glob
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
+# from apscheduler.schedulers.asyncio import AsyncIOScheduler
+# from apscheduler.triggers.cron import CronTrigger
 from discord import Embed, File, DMChannel
 from discord.ext import commands
 from discord.ext.commands import Bot as BotBase
