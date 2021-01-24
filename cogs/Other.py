@@ -115,9 +115,7 @@ class Other(commands.Cog):
         msg = await ctx.send(f'Понг! Задержка: {round(self.bot.latency * 1000)} мс')
         end = time()
         await msg.edit(content=f'Понг! Задержка: `{round(self.bot.latency * 1000)} мс`.\nВремя ответа: `{-round((start - end) * 1000)} мс`')
-    @commands.command()
-    async def test(self, ctx):
-        await ctx.send(ctx.guild.text_channels[0].id)
+
 
 
     @poll.error
