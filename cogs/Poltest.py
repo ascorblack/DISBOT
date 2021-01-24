@@ -77,7 +77,9 @@ class Poltest(commands.Cog):
             i += 1
         await msg.delete()
         browser.find_element_by_id('banner').screenshot('resulttest/result.png')
-        await ctx.send(file=discord.File(open('resulttest/result.png', 'rb')))
+        emb = discord.Embed(title=f'{ctx.author} - ваш результат')
+        file = discord.File(open('resulttest/result.png', 'rb'))
+        await ctx.send(embed=emb, file=file)
 
 def setup(bot):
     bot.add_cog(Poltest(bot))
