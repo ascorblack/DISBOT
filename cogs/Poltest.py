@@ -9,8 +9,6 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import time
-import os
-import boto
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -18,7 +16,6 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
-from boto.s3.connection import S3Connection
 
 class Poltest(commands.Cog):
     """Political Test '9Axes'"""
@@ -27,12 +24,12 @@ class Poltest(commands.Cog):
 
     @commands.command()
     async def poltest(self, ctx):
-        options = webdriver.ChromeOptions()
-        options.headless = True
-        BIN = S3Connection(os.environ['GOOGLE_CHROME_BIN'])
-        options.binary_location = BIN
-        PATH = S3Connection(os.environ['CHROMEDRIVER_PATH'])
-        browser = webdriver.Chrome(executable_path=PATH, options=options)
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--no-sandbox")
+        browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         browser.get("https://9axes.github.io/ru/quiz.html")
 
         i = 0
