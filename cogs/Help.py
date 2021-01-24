@@ -47,7 +47,8 @@ class Help(commands.Cog):
                         if x == y:
                             for c in self.bot.get_cog(y).get_commands():
                                 if not c.hidden:
-                                    colis += f'•`{c.name}` — `{pref}{c.help}`\n'
+                                    if c.help != None:
+                                        colis += f'•`{c.name}` — `{pref}{c.help}`\n'
                 halp=discord.Embed(title=f'Command Listing\n{self.bot.cogs[coges].__doc__}', description=f'{colis}', color = discord.Colour.blurple())
                 await ctx.send('',embed=halp)
             except:
@@ -64,7 +65,7 @@ class Help(commands.Cog):
                             found = True
                     i += 1
                 if not found:
-                    emb = discord.Embed(title='Ooops!',description='How do you even use "'+coges+'"?',color=discord.Color.red())
+                    emb = discord.Embed(title='Ooops!',description=f'No category or command {coges} found',color=discord.Color.red())
                     await ctx.send(embed=emb)
                 else:
                     emb = discord.Embed(description=f'{comms}', color = discord.Colour.blurple())
