@@ -78,7 +78,17 @@ class Poltest(commands.Cog):
         await msg.delete()
         browser.find_element_by_id('banner').screenshot('resulttest/result.png')
         await ctx.send(file=discord.File(open('resulttest/result.png', 'rb')))
+    @commands.command()
+    async def test(self, ctx):
+        options = webdriver.ChromeOptions()
+        options.add_argument("start-maximized")
+        options.add_argument("window-size=1920,1440")
+        options.headless = True
+        browser = webdriver.Chrome(executable_path="selenium/path/chromedriver.exe", options=options)
+        browser.get("https://9axes.github.io/results.html?a=60&b=40&c=40&d=40&e=90&f=40&g=40&h=40&i=40")
 
+        browser.find_element_by_id('banner').screenshot('resulttest/result.png')
+        await ctx.send(file=discord.File(open('resulttest/result.png', 'rb')))
 
 def setup(bot):
     bot.add_cog(Poltest(bot))
