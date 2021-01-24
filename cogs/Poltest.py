@@ -17,6 +17,8 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
+import base64
+
 
 class Poltest(commands.Cog):
     """Political Test '9Axes'"""
@@ -73,15 +75,13 @@ class Poltest(commands.Cog):
                 await ctx.send("Время на ответ истекло!")
                 exit
             i += 1
-        im = browser.find_element_by_id("banner").screenshot(imge["result"])
-        imge = {
-            "result": im
-        }
+        res = {}
+        browser.find_element_by_id("banner").screenshot_as_base64(res["img"])
         # emb = discord.Embed(description='Ваш результат')
         # emb.set_image(url='attachment://resulttest/result.png')
         # await msg.edit(embed=emb)
         await msg.delete()
-        await ctx.send(file=discord.File(imge["result"]))
+        await ctx.send(file=discord.File(res["img"]))
 
 
 def setup(bot):
