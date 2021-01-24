@@ -65,7 +65,7 @@ class Help(commands.Cog):
                             found = True
                     i += 1
                 if not found:
-                    emb = discord.Embed(title='Ooops!',description=f'No category or command {coges} found',color=discord.Color.red())
+                    emb = discord.Embed(title='Ooops!',description=f'No category or command **{coges}** found',color=discord.Color.red())
                     await ctx.send(embed=emb)
                 else:
                     emb = discord.Embed(description=f'{comms}', color = discord.Colour.blurple())
