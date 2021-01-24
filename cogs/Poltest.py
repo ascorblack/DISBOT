@@ -27,7 +27,7 @@ class Poltest(commands.Cog):
     async def poltest(self, ctx):
         options = webdriver.ChromeOptions()
         # options.headless = True
-        options.binary_location = ['GOOGLE_CHROME_BIN']
+        options.binary_location = 'GOOGLE_CHROME_BIN'
         browser = webdriver.Chrome(executable_path='selenium\path\chromedriver.exe', options=options)
         browser.get("https://9axes.github.io/ru/quiz.html")
 
