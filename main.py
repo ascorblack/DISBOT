@@ -4,7 +4,6 @@ import random
 import discord
 import os
 from glob import glob
-from discord import Embed, File, DMChannel
 from discord.ext import commands
 from discord.ext.commands import Bot as BotBase
 from discord.ext.commands import when_mentioned_or, command, has_permissions, HelpCommand, Command, Context

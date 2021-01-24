@@ -54,7 +54,7 @@ class Minigames(commands.Cog):
             await ctx.send('Ничья!')
         else:
             await ctx.send('Выиграл ' + user2 + '!')
-    @commands.command(name="CookeGame", aliases=["CG", "cg"], help = 'cg/CookeGame/CG')
+    @commands.command(name="CookieGame", aliases=["CG", "cg"], help = 'cg/CookieGame/CG')
     async def CookeGame(self, ctx):
         emb = discord.Embed(title='Игра "Печенька"', color=discord.Colour.orange())
         emb.add_field(name='Правила', value='Кто первый нажмёт на реакцию - победил!')
