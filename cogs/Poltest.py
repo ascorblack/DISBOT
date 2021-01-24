@@ -9,6 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import time
+import os
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -16,7 +17,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
-
+from boto.s3.connection import S3Connection
 
 class Poltest(commands.Cog):
     """Political Test '9Axes'"""
@@ -27,8 +28,10 @@ class Poltest(commands.Cog):
     async def poltest(self, ctx):
         options = webdriver.ChromeOptions()
         options.headless = True
-        options.binary_location = ENV['GOOGLE_CHROME_BIN']
-        browser = webdriver.Chrome(executable_path=ENV['CHROMEDRIVER_PATH'], options=options)
+        BIN = S3Connection(os.environ['GOOGLE_CHROME_BIN'])
+        options.binary_location = BIN
+        PATH = S3Connection(os.environ['CHROMEDRIVER_PATH'])
+        browser = webdriver.Chrome(executable_path=PATH, options=options)
         browser.get("https://9axes.github.io/ru/quiz.html")
 
         i = 0
