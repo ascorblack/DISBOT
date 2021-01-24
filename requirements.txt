@@ -7,3 +7,4 @@ requests
 bs4
 lxml
 selenium
+https://github.com/stomita/heroku-buildpack-phantomjs
