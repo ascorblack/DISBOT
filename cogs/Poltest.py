@@ -74,9 +74,11 @@ class Poltest(commands.Cog):
                 exit
             i += 1
         browser.find_element_by_id("banner").screenshot('resulttest/result.png')
-        emb = discord.Embed(description='Ваш результат')
-        emb.set_image(url='attachment://resulttest/result.png')
-        await msg.edit(embed=emb)
+        # emb = discord.Embed(description='Ваш результат')
+        # emb.set_image(url='attachment://resulttest/result.png')
+        # await msg.edit(embed=emb)
+        await msg.delete()
+        await ctx.send(file=discord.File('resulttest/result.png'))
 
 
 def setup(bot):
