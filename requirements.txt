@@ -7,4 +7,4 @@ requests
 bs4
 lxml
 selenium
-https://github.com/stomita/heroku-buildpack-phantomjs
+heroku create --stack cedar --buildpack https://github.com/stomita/heroku-buildpack-phantomjs.git
