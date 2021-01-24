@@ -75,7 +75,9 @@ class Poltest(commands.Cog):
                 await ctx.send("Время на ответ истекло!")
                 exit
             i += 1
-        res = {}
+        res = {
+            "img": {}
+        }
         browser.find_element_by_id("banner").screenshot_as_base64(res["img"])
         # emb = discord.Embed(description='Ваш результат')
         # emb.set_image(url='attachment://resulttest/result.png')
