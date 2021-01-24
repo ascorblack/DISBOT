@@ -80,11 +80,13 @@ class Poltest(commands.Cog):
         await ctx.send(file=discord.File(open('resulttest/result.png', 'rb')))
     @commands.command()
     async def test(self, ctx):
-        options = webdriver.ChromeOptions()
-        options.add_argument("start-maximized")
-        options.add_argument("window-size=1920,1440")
-        options.headless = True
-        browser = webdriver.Chrome(executable_path="selenium/path/chromedriver.exe", options=options)
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("window-size=1920,1440")
+        browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         browser.get("https://9axes.github.io/results.html?a=60&b=40&c=40&d=40&e=90&f=40&g=40&h=40&i=40")
 
         browser.find_element_by_id('banner').screenshot('resulttest/result.png')
