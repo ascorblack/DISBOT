@@ -27,7 +27,7 @@ class Poltest(commands.Cog):
 
     @commands.command(help = 'poltest\nПолитический тест 9Axes')
     async def poltest(self, ctx):
-        emb = discord.Embed(description="**Значение реакций**\n✅ - Полностью согласен\n👍 - Скорее согласен\n👊 - Нейтрально/Не уверен\n👎 - Скорее не согласен\n❌ - Полностью не согласен\n⏪ - На прошлый вопрос\n⏹ - Покинуть сессию\n__НА КАЖДЫЙ ВОПРОС ОТВОДИТСЯ 5 МИНУТ__\n\n*Нажмите ▶️ для начала*")
+        emb = discord.Embed(description="**Значение реакций**\n✅ - Полностью согласен\n🟩 - Скорее согласен\n🟨 - Нейтрально/Не уверен\n🟥 - Скорее не согласен\n❌ - Полностью не согласен\n⏪ - На прошлый вопрос\n⏹ - Покинуть сессию\n__НА КАЖДЫЙ ВОПРОС ОТВОДИТСЯ 5 МИНУТ__\n\n*Нажмите ▶️ для начала*")
         emb.set_footer(text='Оригинал теста https://9axes.github.io/ru/')
         rule = await ctx.send(embed=emb)
         start = '▶️'
@@ -67,7 +67,7 @@ class Poltest(commands.Cog):
                         await msg.edit(embed=emb)
                     else:
                         msg = await ctx.send(embed=emb)
-                    emojis = ["✅", "👍", "👊", "👎", "❌", "▪️", "⏪", "⏹"]
+                    emojis = ["✅", "🟩", "🟨", "🟥", "❌", "▪️", "⏪", "⏹"]
                     while e < len(emojis):
                         emoji = emojis[e].strip()
                         await msg.add_reaction(emoji)
@@ -80,13 +80,13 @@ class Poltest(commands.Cog):
                         if str(reaction.emoji) == "✅":
                             button = browser.find_element_by_xpath('//*[@onclick="next_question( 2)"]')
                             ActionChains(browser).click(button).perform()
-                        if str(reaction.emoji) == "👍":
+                        if str(reaction.emoji) == "🟩":
                             button = browser.find_element_by_xpath('//*[@onclick="next_question( 1)"]')
                             ActionChains(browser).click(button).perform()
-                        if str(reaction.emoji) == "👊":
+                        if str(reaction.emoji) == "🟨":
                             button = browser.find_element_by_xpath('//*[@onclick="next_question( 0)"]')
                             ActionChains(browser).click(button).perform()
-                        if str(reaction.emoji) == "👎":
+                        if str(reaction.emoji) == "🟥":
                             button = browser.find_element_by_xpath('//*[@onclick="next_question(-1)"]')
                             ActionChains(browser).click(button).perform()
                         if str(reaction.emoji) == "❌":
