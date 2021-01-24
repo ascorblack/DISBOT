@@ -24,7 +24,7 @@ class Admin(commands.Cog):
         await ctx.channel.purge(limit=amount)
         emb = discord.Embed(color=discord.Colour.dark_grey(), description='Было отчищенно ' + str(amount) + ' сообщений!')
         await ctx.send(embed=emb)
-    @commands.command(aliases=["spam"], help = 'шнюк/nuke <quanti> <text>')
+    @commands.command(aliases=["spam"], help = 'шнюк/spam <quanti> <text>')
     @has_permissions(administrator=True)
     async def шнюк(self, ctx, k, *, text):
         mess = await get_last_mess(ctx, member = None)
@@ -36,7 +36,7 @@ class Admin(commands.Cog):
     @commands.command(aliases=["нюк"], hidden = True)
     @commands.is_owner()
     async def nuke(self, ctx):
-        emb = discord.Embed(description=f'{ctx.author}Ты уверен?')
+        emb = discord.Embed(description=f'{ctx.author} Ты уверен?', color = discord.Colour.red())
         warn = await ctx.send(embed=emb)
         emoji = '🔛'
         await warn.add_reaction(emoji)
@@ -44,14 +44,14 @@ class Admin(commands.Cog):
             return str(reaction.emoji) == emoji and user.id == ctx.author.id
         try:
             reaction, user = await self.bot.wait_for("reaction_add", timeout=3, check=check)
-            emb = discord.Embed(description=f'{ctx.author} начал полное уничтожение сервера!')
+            emb = discord.Embed(description=f'{ctx.author} начал полное уничтожение сервера!', color = discord.Colour.red())
             await warn.edit(embed=emb)
             for member in ctx.guild:
                 if not member.bot:
                     if member != ctx.author:
                         await ctx.guild.ban(member, reason='😈 СЕРВЕР ЗАХВАЧЕН!')
         except asyncio.TimeoutError:
-            emb = discord.Embed(description=f'{ctx.author} не успел активировать бомбу')
+            emb = discord.Embed(description=f'{ctx.author} не успел активировать бомбу', color = discord.Colour.green())
             await warn.edit(embed=emb)
     @commands.command(help = 'say <text>')
     @commands.is_owner()
@@ -446,12 +446,11 @@ class Admin(commands.Cog):
     async def ownerlist(self, ctx):
         with open('cogs/data.json', 'r') as f:
             owners = json.load(f)
-        ownlist = []
+        msg = ''
         for own in owners['owners']:
-            ownlist.append(own)
-        '\n'.split(str(ownlist))
-        emb = discord.Embed(description=f'{ownlist}')
-        await ctx.send(emb)
+            msg += f'{own}\n'
+        emb = discord.Embed(description=msg)
+        await ctx.send(embed=emb)
 
 
     @say.error
@@ -462,7 +461,7 @@ class Admin(commands.Cog):
     @шнюк.error
     async def шнюк_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            synt = 'шнюк/nuke <quanti> <text>'
+            synt = 'шнюк/spam <quanti> <text>'
             await get_error(ctx, synt)
     @additem.error
     async def additem_error(self, ctx, error):

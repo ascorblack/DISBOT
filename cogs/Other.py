@@ -116,8 +116,6 @@ class Other(commands.Cog):
         end = time()
         await msg.edit(content=f'Понг! Задержка: `{round(self.bot.latency * 1000)} мс`.\nВремя ответа: `{-round((start - end) * 1000)} мс`')
 
-
-
     @poll.error
     async def poll_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):

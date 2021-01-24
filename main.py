@@ -27,6 +27,16 @@ bot = commands.Bot(command_prefix=get_prefix, owner_ids = get_ownerses(), intent
 bot.remove_command("help")
 bot.queue = []
 
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        emb = discord.Embed(description=f":no_entry_sign: **{ctx.author}** You are missing Administrator permission to run this command.", color=discord.Colour.red())
+        await ctx.send(embed=emb)
+    if isinstance(error, commands.NotOwner):
+        emb = discord.Embed(description=f":no_entry_sign: **{ctx.author}** You do not owner this bot!", color=discord.Colour.red())
+        await ctx.send(embed=emb)
+
+
 #Load Cogs
 fil = ''
 bot.coglist = []
