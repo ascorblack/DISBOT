@@ -7,4 +7,3 @@ requests
 bs4
 lxml
 selenium
-time
