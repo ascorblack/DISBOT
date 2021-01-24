@@ -27,6 +27,23 @@ class Poltest(commands.Cog):
 
     @commands.command(help = 'poltest\nПолитический тест 9Axes')
     async def poltest(self, ctx):
+        emb = discord.Embed(description="**Версия теста**\n🅰️ - из 216 вопросов\n🅱️ - из 45 вопросов\n")
+        emb.set_footer(text='Оригинал теста https://9axes.github.io/ru/')
+        choice = await ctx.send(embed=emb)
+        cho = ['🅰️', '🅱️']
+        await choice.add_reaction(cho[0])
+        await choice.add_reaction(cho[1])
+        def check(reaction, user):
+            return user != self.bot.user and str(reaction.emoji) in cho and user.id == ctx.author.id
+        try:
+            reaction, user = await self.bot.wait_for("reaction_add", timeout=20, check=check)
+            await choice.delete()
+            if str(reaction.emoji) == '🅰️':
+                urlt = "https://9axes.github.io/ru/fullquiz.html"
+            if str(reaction.emoji) == '🅱️':
+                urlt = "https://9axes.github.io/ru/quiz.html"
+        except asyncio.TimeoutError:
+            exit
         emb = discord.Embed(description="**Значение реакций**\n✅ - Полностью согласен\n🟩 - Скорее согласен\n🟨 - Нейтрально/Не уверен\n🟥 - Скорее не согласен\n❌ - Полностью не согласен\n⏪ - На прошлый вопрос\n⏹ - Покинуть сессию\n__НА КАЖДЫЙ ВОПРОС ОТВОДИТСЯ 5 МИНУТ__\n\n*Нажмите ▶️ для начала*")
         emb.set_footer(text='Оригинал теста https://9axes.github.io/ru/')
         rule = await ctx.send(embed=emb)
@@ -44,7 +61,7 @@ class Poltest(commands.Cog):
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("window-size=1920,1440")
             browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
-            browser.get("https://9axes.github.io/ru/quiz.html")
+            browser.get(urlt)
 
             i = 0
             e = 0
