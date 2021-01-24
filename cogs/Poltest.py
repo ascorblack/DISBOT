@@ -25,9 +25,9 @@ class Poltest(commands.Cog):
 
     @commands.command()
     async def poltest(self, ctx):
-        options = webdriver.ChromeOptions()
+        # options = webdriver.ChromeOptions()
         # options.headless = True
-        browser = webdriver.Chrome(executable_path='selenium\path\chromedriver.exe', options=options)
+        browser = webdriver.PhantomJS()
         browser.get("https://9axes.github.io/ru/quiz.html")
 
         i = 0
@@ -71,7 +71,7 @@ class Poltest(commands.Cog):
             i += 1
         result = browser.find_element_by_id("banner").screenshot_as_png
         await ctx.send(file=discord.File(result))
-
+        browser.quit()
 
 
 def setup(bot):
