@@ -24,18 +24,6 @@ def get_ownerses():
         ownerses.append(own)
     return ownerses
 
-
-	# to_remove = []
-	# stored_members = db.column("SELECT UserID FROM exp")
-	# for id_ in stored_members:
-	# 	if not bot.guild.get_member(id_):
-	# 		to_remove.append(id_)
-
-	# db.multiexec("DELETE FROM exp WHERE UserID = ?",
-	# 			 ((id_,) for id_ in to_remove))
-
-    db.commit()
-
 bot = commands.Bot(command_prefix=get_prefix, owner_ids = get_ownerses(), intents = discord.Intents.all())
 bot.remove_command("help")
 bot.queue = []
