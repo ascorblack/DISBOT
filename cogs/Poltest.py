@@ -96,23 +96,23 @@ class Poltest(commands.Cog):
                         reaction, user = await self.bot.wait_for("reaction_add", timeout=300, check=check)
                         if str(reaction.emoji) == "✅":
                             await msg.remove_reaction(emoji = "✅", member = ctx.author)
-                            button = browser.find_element_by_xpath('//*[@onclick="next_qu
+                            button = browser.find_element_by_xpath('//*[@onclick="next_question( 2)"]')
                             ActionChains(browser).click(button).perform()
                         if str(reaction.emoji) == "🟩":
                             await msg.remove_reaction(emoji = "🟩", member = ctx.author)
-                            button = browser.find_element_by_xpath('//*[@onclick="next_qu
+                            button = browser.find_element_by_xpath('//*[@onclick="next_question( 1)"]')
                             ActionChains(browser).click(button).perform()
                         if str(reaction.emoji) == "🟨":
                             await msg.remove_reaction(emoji = "🟨", member = ctx.author)
-                            button = browser.find_element_by_xpath('//*[@onclick="next_qu
+                            button = browser.find_element_by_xpath('//*[@onclick="next_question( 0)"]')
                             ActionChains(browser).click(button).perform()
                         if str(reaction.emoji) == "🟥":
                             await msg.remove_reaction(emoji = "🟥", member = ctx.author)
-                            button = browser.find_element_by_xpath('//*[@onclick="next_qu
+                            button = browser.find_element_by_xpath('//*[@onclick="next_question(-1)"]')
                             ActionChains(browser).click(button).perform()
                         if str(reaction.emoji) == "❌":
                             await msg.remove_reaction(emoji = "❌", member = ctx.author)
-                            button = browser.find_element_by_xpath('//*[@onclick="next_qu
+                            button = browser.find_element_by_xpath('//*[@onclick="next_question(-2)"]')
                             ActionChains(browser).click(button).perform()
                         if str(reaction.emoji) == "⏪":
                             await msg.remove_reaction(emoji = "⏪", member = ctx.author)
