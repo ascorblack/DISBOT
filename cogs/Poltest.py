@@ -125,8 +125,10 @@ class Poltest(commands.Cog):
                                 browser.close()
                                 await msg.delete()
                         except asyncio.TimeoutError:
-                            await ctx.send("Время на ответ истекло!")
-                            exit
+                            emb.set_footer(text='Время ожидания превышено!')
+                            await msg.edit(embed=emb)
+                            browser.close()
+                            break
                         i += 1
             except asyncio.TimeoutError:
                 emb.set_footer(text='Время ожидания превышено!')
