@@ -90,7 +90,7 @@ class Poltest(commands.Cog):
                             e += 1
 
                         def check(reaction, user):
-                            return user != self.bot.user and str(reaction.emoji) in emojis
+                            return user != self.bot.user and user.id == ctx.author.id and str(reaction.emoji) in emojis
                         try:
                             reaction, user = await self.bot.wait_for("reaction_add", timeout=300, check=check)
                             if str(reaction.emoji) == "✅":
