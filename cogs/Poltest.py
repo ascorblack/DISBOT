@@ -70,9 +70,8 @@ class Poltest(commands.Cog):
                         check = browser.find_element_by_id('banner')
                         await msg.delete()
                         browser.find_element_by_id('banner').screenshot('resulttest/result.png')
-                        emb = discord.Embed(title=f'{ctx.author} - ваш результат')
                         file = discord.File(open('resulttest/result.png', 'rb'))
-                        await ctx.send(embed=emb, file=file)
+                        await ctx.send(f'**{ctx.author.mention}** — ваш результат', file=file)
                         finish = True
                     except:
                         num = browser.find_element_by_id("question-number").text
