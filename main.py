@@ -35,6 +35,9 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.NotOwner):
         emb = discord.Embed(description=f":no_entry_sign: **{ctx.author}** You do not owner this bot!", color=discord.Colour.red())
         await ctx.send(embed=emb)
+    if isinstance(error, commands.NSFWChannelRequired):
+        emb = discord.Embed(description=f':no_entry_sign: Канал **{ctx.channel}** не является NSFW!', color = discord.Colour.red())
+        await ctx.send(embed=emb)
 
 
 #Load Cogs
