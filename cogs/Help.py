@@ -61,8 +61,12 @@ class Help(commands.Cog):
                     comma = cog.get_commands()
                     for co in comma:
                         if str(co) == str(coges):
-                            comms += f'**Command**\n```{co.name}```\n**Syntax** ```{pref}{co.help}```\n**Aliases**```{co.aliases}```'
-                            found = True
+                            if co.aliases == []:
+                                comms += f'**Command**\n```{co.name}```\n**Syntax** ```{pref}{co.help}```'
+                                found = True
+                            else:
+                                comms += f'**Command**\n```{co.name}```\n**Syntax** ```{pref}{co.help}```\n**Aliases**```{co.aliases}```'
+                                found = True
                     i += 1
                 if not found:
                     emb = discord.Embed(title='Ooops!',description=f'No category or command **{coges}** found',color=discord.Color.red())

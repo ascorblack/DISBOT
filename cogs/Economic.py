@@ -13,21 +13,21 @@ class Economic(commands.Cog):
         self.bot = bot
 
 
-    @commands.command(aliases=["зп"], help = 'wages')
-    async def wages(self, ctx):
-        emo = await get_ecoemoji(ctx)
-        if not str(ctx.author.id) in self.bot.queue:
-            emb = discord.Embed(description=f'**{ctx.author}** Вы получили свои 150 {emo}\nСледующее получение будет доступно только через 2 минуты')
-            await ctx.send(embed=emb)
-            member = ctx.author
-            await up_money(ctx, member, co = +150)
-            db.commit()
-            self.bot.queue.append(str(ctx.author.id))
-            await asyncio.sleep(120)
-            self.bot.queue.remove(str(ctx.author.id))
-        if str(ctx.author.id) in self.bot.queue:
-            emb = discord.Embed(description=f'**{ctx.author}** Вы уже получили свою награду')
-            await ctx.send(embed=emb)
+    # @commands.command(help = 'wages \nПолучить деньги')
+    # async def wages(self, ctx):
+    #     emo = await get_ecoemoji(ctx)
+    #     if not str(ctx.author.id) in self.bot.queue:
+    #         emb = discord.Embed(description=f'**{ctx.author}** Вы получили свои 150 {emo}\nСледующее получение будет доступно только через 2 минуты')
+    #         await ctx.send(embed=emb)
+    #         member = ctx.author
+    #         await up_money(ctx, member, co = +150)
+    #         db.commit()
+    #         self.bot.queue.append(str(ctx.author.id))
+    #         await asyncio.sleep(120)
+    #         self.bot.queue.remove(str(ctx.author.id))
+    #     if str(ctx.author.id) in self.bot.queue:
+    #         emb = discord.Embed(description=f'**{ctx.author}** Вы уже получили свою награду')
+    #         await ctx.send(embed=emb)
     @commands.command(aliases=["баланс", "bal"], help = 'balance <@member>')
     async def balance(self, ctx, member: discord.Member = None):
         emo = await get_ecoemoji(ctx)

@@ -6,6 +6,7 @@ from discord.ext.commands import has_permissions
 import asyncio
 from funcs import *
 from time import time
+from datetime import date, timedelta, datetime
 
 
 class Other(commands.Cog):
@@ -115,6 +116,33 @@ class Other(commands.Cog):
         msg = await ctx.send(f'Понг! Задержка: {round(self.bot.latency * 1000)} мс')
         end = time()
         await msg.edit(content=f'Понг! Задержка: `{round(self.bot.latency * 1000)} мс`.\nВремя ответа: `{-round((start - end) * 1000)} мс`')
+    @commands.command(help = 'stat')
+    async def stat(self, ctx):
+        now = datetime.utcnow()
+        t14 = now - timedelta(days=14)
+        t7 = now - timedelta(days=7)
+        t1 = now - timedelta(days=1)
+        c14 = 0
+        c7 = 0
+        c1 = 0
+        for channel in ctx.guild.text_channels:
+            async for msg in channel.history(after=t14, limit=None):
+                if msg.author.id == ctx.author.id:
+                    c14 += 1
+            async for msg in channel.history(after=t7, limit=None):
+                if msg.author.id == ctx.author.id:
+                    c7 += 1
+            async for msg in channel.history(after=t1, limit=None):
+                if msg.author.id == ctx.author.id:
+                    c1 += 1
+        emb = discord.Embed(title=f'{ctx.author}', color = discord.Colour.random())
+        emb.add_field(name = 'Пользовательская информация', value=f'Присоединился к серверу: `{ctx.author.joined_at.strftime("%d.%m.%Y (%H:%M)")}`\nСоздал аккаунт: `{ctx.author.created_at.strftime("%d.%m.%Y (%H:%M)")}`\nID: `{ctx.author.id}`', inline=False)
+        emb.add_field(name='Сообщения', value=f'За 14 дней: `{c14} сообщений`\nЗа 7 дней: `{c7} сообщений`\nЗа последние 24 часа: `{c1} сообщений`')
+        emb.add_field(name='Топ роль', value=f'**{ctx.author.top_role}**')
+        emb.set_thumbnail(url=ctx.author.avatar_url)
+        await ctx.send(embed=emb)
+
+
 
     @poll.error
     async def poll_error(self, ctx, error):

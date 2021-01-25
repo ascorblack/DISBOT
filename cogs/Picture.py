@@ -30,7 +30,7 @@ class Picture(commands.Cog):
         else:
             emb = discord.Embed(title=f'{ctx.author}, пожалуйста, напиши тэг')
             await ctx.send(embed=emb)
-    @commands.command(hidden=True, help = 'r34 <tags>\nSearch on https://rule34.xxx/')
+    @commands.command(help = 'r34 <tags>\nSearch on https://rule34.xxx/')
     @commands.is_nsfw()
     async def r34(self, ctx, *, tag = None):
         if tag != None:

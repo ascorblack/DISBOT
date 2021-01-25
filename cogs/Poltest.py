@@ -25,7 +25,7 @@ class Poltest(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(help = 'poltest\nПолитический тест 9Axes')
+    @commands.command(help = 'poltest \nПолитический тест 9Axes')
     async def poltest(self, ctx):
         emb = discord.Embed(description="**Версия теста**\n🅰️ - из 216 вопросов\n🅱️ - из 45 вопросов\n")
         emb.set_footer(text='Оригинал теста https://9axes.github.io/ru/')
