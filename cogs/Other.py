@@ -95,14 +95,16 @@ class Other(commands.Cog):
                 i += 1
                 pass
             else:
-                ball += f'{bal[i]}'
-                namm += f'{name[i]}'
-                if i <= 2:
-                    msg += '**{0}. {1} — {2} {3}**\n'.format(i+1, namm[2:-3], ball[1:-2], emo)
-                if i > 2:
-                    msg += '{0}. {1} — {2} {3}\n'.format(i+1, namm[2:-3], ball[1:-2], emo)
-                ball = ''
-                namm = ''
+                check = f'{bal[i]}'
+                if check[1:-2] != str(0):
+                    ball += f'{bal[i]}'
+                    namm += f'{name[i]}'
+                    if i <= 2:
+                        msg += '**{0}. {1} — {2} {3}**\n'.format(i+1, namm[2:-3], ball[1:-2], emo)
+                    if i > 2:
+                        msg += '{0}. {1} — {2} {3}\n'.format(i+1, namm[2:-3], ball[1:-2], emo)
+                    ball = ''
+                    namm = ''
                 i += 1
         emb = discord.Embed(title=f'**{ctx.guild.name}** | Топ лидеров {emo}', description=f'{msg}', color = discord.Colour.blue())
         await ctx.send(embed=emb)
