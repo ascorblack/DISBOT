@@ -30,15 +30,18 @@ bot.queue = []
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        emb = discord.Embed(description=f":no_entry_sign: **{ctx.author}** You are missing Administrator permission to run this command.", color=discord.Colour.red())
+        emb = discord.Embed(description=f":no_entry_sign: **{ctx.author}** У тебя нет прав администратора для использования команды **{ctx.command}**", color=discord.Colour.red())
         await ctx.send(embed=emb)
     if isinstance(error, commands.NotOwner):
-        emb = discord.Embed(description=f":no_entry_sign: **{ctx.author}** You do not owner this bot!", color=discord.Colour.red())
+        emb = discord.Embed(description=f":no_entry_sign: **{ctx.author}** Тебя нет в списке Owners!", color=discord.Colour.red())
         await ctx.send(embed=emb)
     if isinstance(error, commands.NSFWChannelRequired):
         emb = discord.Embed(description=f':no_entry_sign: Канал **{ctx.channel}** не является NSFW!', color = discord.Colour.red())
         await ctx.send(embed=emb)
-
+    if isinstance(error, commands.MissingRequiredArgument) or isinstance(error, commands.CommandInvokeError):
+        pref = await get_prefixes(ctx)
+        emb = discord.Embed(description=f':no_entry_sign: Неверный синтаксис комманды!\n`{pref}{ctx.command.help}`', color = discord.Colour.red())
+        await ctx.send(embed=emb)
 
 #Load Cogs
 fil = ''
