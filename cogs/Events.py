@@ -49,7 +49,6 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        print(f'{member} join!')
         guild = member.guild
         welchan = db.field("SELECT ChannelID FROM welchannel WHERE GuildID = ?", guild.id)
         if welchan != None:
@@ -65,13 +64,12 @@ class Events(commands.Cog):
     
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        print(f'{member} left!')
         guild = member.guild
         exchan = db.field("SELECT ChannelID FROM exitchannel WHERE GuildID = ?", guild.id)
         if exchan != None:
             channel = self.bot.get_channel(exchan)
             msg = db.field("SELECT Message FROM exitchannel WHERE ChannelID = ?", exchan)
-            await channel.send(f'{member.mention} {msg}')
+            await channel.send(f'**{member}** {msg}')
 
     @commands.Cog.listener()
     async def on_connect(self):
