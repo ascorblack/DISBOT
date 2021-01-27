@@ -43,7 +43,7 @@ async def on_command_error(ctx, error):
         emb = discord.Embed(description=f':no_entry_sign: Неверный синтаксис комманды!\n`{pref}{ctx.command.help}`', color = discord.Colour.red())
         await ctx.send(embed=emb)
     if isinstance(error, commands.CommandInvokeError):
-        if str(ctx.command) != "emoinfo":
+        if not str(ctx.command) in ["emoinfo", "poltest"]:
             pref = await get_prefixes(ctx)
             emb = discord.Embed(description=f':no_entry_sign: Неверный синтаксис комманды!\n`{pref}{ctx.command.help}`', color = discord.Colour.red())
             await ctx.send(embed=emb)
