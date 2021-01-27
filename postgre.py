@@ -26,7 +26,7 @@ async def main():
 
     await conn.execute('''
         INSERT INTO users(name, dob) VALUES($1, $2)
-    ''', 'Bob', datetime.date(1984, 3, 1))
+    ''', 'Bob', 23453425)
 
     row = await conn.fetchrow(
         'SELECT * FROM users WHERE name = $1', 'Bob')
