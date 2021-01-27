@@ -38,10 +38,15 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.NSFWChannelRequired):
         emb = discord.Embed(description=f':no_entry_sign: Канал **{ctx.channel}** не является NSFW!', color = discord.Colour.red())
         await ctx.send(embed=emb)
-    if isinstance(error, commands.MissingRequiredArgument) or isinstance(error, commands.CommandInvokeError):
+    if isinstance(error, commands.MissingRequiredArgument) or isinstance(error, commands.BadArgument):
         pref = await get_prefixes(ctx)
         emb = discord.Embed(description=f':no_entry_sign: Неверный синтаксис комманды!\n`{pref}{ctx.command.help}`', color = discord.Colour.red())
         await ctx.send(embed=emb)
+    if isinstance(error, commands.CommandInvokeError):
+        if str(ctx.command) != "emoinfo":
+            pref = await get_prefixes(ctx)
+            emb = discord.Embed(description=f':no_entry_sign: Неверный синтаксис комманды!\n`{pref}{ctx.command.help}`', color = discord.Colour.red())
+            await ctx.send(embed=emb)
 
 #Load Cogs
 fil = ''

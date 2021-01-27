@@ -27,7 +27,7 @@ class Poltest(commands.Cog):
 
     @commands.command(help = 'poltest \nПолитический тест 9Axes')
     async def poltest(self, ctx):
-        emb = discord.Embed(description="**Версия теста**\n🅰️ — из 216 вопросов\n🅱️ — из 45 вопросов\n")
+        emb = discord.Embed(description="**Версия теста**\n🅰️ — из 216 вопросов\n🅱️ — из 45 вопросов\n", color = await hid_emb())
         emb.set_footer(text='Оригинал теста https://9axes.github.io/ru/')
         choice = await ctx.send(embed=emb)
         cho = ['🅰️', '🅱️']
@@ -43,7 +43,7 @@ class Poltest(commands.Cog):
             if str(reaction.emoji) == '🅱️':
                 urlt = "https://9axes.github.io/ru/quiz.html"
 
-            emb = discord.Embed(description="**Значение реакций**\n✅ — Полностью согласен\n🟩 — Скорее согласен\n🟨 — Нейтрально/Не уверен\n🟥 — Скорее не согласен\n❌ — Полностью не согласен\n⏪ — На прошлый вопрос\n⏹ — Покинуть сессию\n__НА КАЖДЫЙ ВОПРОС ОТВОДИТСЯ 5 МИНУТ__\n\n*Нажмите ▶️ для начала*")
+            emb = discord.Embed(description="**Значение реакций**\n✅ — Полностью согласен\n🟩 — Скорее согласен\n🟨 — Нейтрально/Не уверен\n🟥 — Скорее не согласен\n❌ — Полностью не согласен\n⏪ — На прошлый вопрос\n⏹ — Покинуть сессию\n__НА КАЖДЫЙ ВОПРОС ОТВОДИТСЯ 5 МИНУТ__\n\n*Нажмите ▶️ для начала*", color = await hid_emb())
             emb.set_footer(text='Оригинал теста https://9axes.github.io/ru/')
             rule = await ctx.send(embed=emb)
             start = '▶️'
@@ -76,7 +76,7 @@ class Poltest(commands.Cog):
                     except:
                         num = browser.find_element_by_id("question-number").text
                         quest = browser.find_element_by_id("question-text").text
-                        emb = discord.Embed(description=f'**{num}**\n```{quest}```')
+                        emb = discord.Embed(description=f'**{num}**\n```{quest}```', color = await hid_emb())
                         emb.set_footer(icon_url=self.bot.user.avatar_url, text='Код написан SCORPS#7927')
                         if i > 0:
                             await msg.edit(embed=emb)
