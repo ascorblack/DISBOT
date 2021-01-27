@@ -100,56 +100,7 @@ class Shop(commands.Cog):
                 await ctx.send(embed=emb)
         with open('cogs/data.json', 'w') as f:
             json.dump(buyi, f)
-    @commands.command(aliases=["transfer", "give"], help = 'give/trans <@member> <item-name> <quantity>')
-    async def trans(self, ctx, member: discord.Member, name = None, arg = 0):
-        money = await get_data()
-        if arg <= 0:
-            emb = discord.Embed(description=f'Вы не можете передать отрицательное/нулевое количество!')
-            await ctx.send(embed=emb)
-            exit
-        if not str(member.id) in money["servers"][str(ctx.guild.id)]['inv']:
-            money["servers"][str(ctx.guild.id)]['inv'][str(member.id)] = {}
-        if name in money["servers"][str(ctx.guild.id)]['inv'][str(ctx.author.id)]:
-            if arg > money["servers"][str(ctx.guild.id)]['inv'][str(ctx.author.id)][name]['quanti']:
-                emb = discord.Embed(description=f'Вы не можете передать больше {name}, чем имеете!')
-                await ctx.send(embed=emb)
-            else:
-                if arg < money["servers"][str(ctx.guild.id)]['inv'][str(ctx.author.id)][name]['quanti']:
-                    money["servers"][str(ctx.guild.id)]['inv'][str(ctx.author.id)][name]['quanti'] -= arg
-                if arg == money["servers"][str(ctx.guild.id)]['inv'][str(ctx.author.id)][name]['quanti']:
-                    del money["servers"][str(ctx.guild.id)]['inv'][str(ctx.author.id)][name]
-                if name in money["servers"][str(ctx.guild.id)]['inv'][str(member.id)]:
-                    money["servers"][str(ctx.guild.id)]['inv'][str(member.id)][name]['quanti'] += arg
-                    emb = discord.Embed(description=f'**{ctx.author}** передал **{member}** {arg} единиц __"{name}"__')
-                    await ctx.send(embed=emb)
-                else:
-                    money["servers"][str(ctx.guild.id)]['inv'][str(member.id)][name] = {}
-                    money["servers"][str(ctx.guild.id)]['inv'][str(member.id)][name]['quanti'] = arg
-                    emb = discord.Embed(description=f'**{ctx.author}** передал **{member}** {arg} единиц __"{name}"__')
-                    await ctx.send(embed=emb)
-        else:
-            emb = discord.Embed(description=f'У вас нет этого предмета!')
-            await ctx.send(embed=emb)
-        with open('cogs/data.json', 'w') as f:
-            json.dump(money, f)
-    @commands.command(help = 'pay <@member> <quantity money>')
-    async def pay(self, ctx, member: discord.Member, qu: int):
-        balau = await get_money(ctx, member = ctx.author)
-        emo = await get_ecoemoji(ctx)
-        if qu <= 0:
-            emb = discord.Embed(description=f'Вы не можете передать отрицательное/нулевое количество {emo}')
-            await ctx.send(embed=emb)
-        else:
-            if balau >= qu:
-                await up_money(ctx, member, co = +qu)
-                db.commit()
-                await up_money(ctx, member = ctx.author, co = -qu)
-                db.commit()
-                emb = discord.Embed(description=f'{ctx.author} передал {member} {qu} {emo}')
-                await ctx.send(embed=emb)
-            else:
-                emb = discord.Embed(description=f'У вас недостаточно {emo} для такой транзакции!')
-                await ctx.send(embed=emb)
+    
 
 
 def setup(bot):

@@ -331,9 +331,9 @@ class Admin(commands.Cog):
             json.dump(clea, f)
 
 #Join/leave member commands
-    @commands.command(aliases=["swch", "setchanwel"], help = 'setwelch/swch <channelID>')
+    @commands.command(help = 'setwelch/swch <channelID>')
     @has_permissions(administrator=True)
-    async def setwelcom(self, ctx, channel: int):
+    async def setwelc(self, ctx, channel: int):
         found = False
         for chann in ctx.guild.text_channels:
             channi = chann.id
@@ -353,7 +353,7 @@ class Admin(commands.Cog):
         if not found:
             emb = discord.Embed(description=f':no_entry_sign: Введите корректный **текстовый** канал!')
             await ctx.send(embed=emb)
-    @commands.command(aliases=["sech", "setchanexit"], help = 'setexit/sech <channelID>')
+    @commands.command(help = 'setexit/sech <channelID>')
     @has_permissions(administrator=True)
     async def setexit(self, ctx, channel: int):
         found = False
@@ -377,7 +377,7 @@ class Admin(commands.Cog):
             await ctx.send(embed=emb)
     @commands.command(help = 'setwelmsg *message')
     @has_permissions(administrator=True)
-    async def setwelmsg(self, ctx, *, msg):
+    async def setwelсmsg(self, ctx, *, msg):
         if msg != None:
             db.execute("UPDATE welchannel SET Message = ? WHERE GuildID = ?", str(msg), ctx.guild.id)
             db.commit()
