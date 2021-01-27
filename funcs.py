@@ -72,3 +72,6 @@ async def up_money(ctx, member, co):
 
 async def add_bal_user(ctx, member):
     return db.execute("INSERT OR IGNORE INTO balance (GuildID, GuildName, MemberName, MemberID) VALUES (?,?,?,?)", ctx.guild.id, ctx.guild.name, member.name, member.id)
+
+async def hid_emb():
+    return discord.Colour.from_rgb(47, 49, 54)
