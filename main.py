@@ -9,7 +9,6 @@ from discord.ext.commands import Bot as BotBase
 from discord.ext.commands import when_mentioned_or, command, has_permissions, HelpCommand, Command, Context
 import time
 from funcs import *
-from postgre import *
 from db import db
 
 
