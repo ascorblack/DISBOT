@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import os
 
 
-cluster = MongoClient(os.environ.get("MONGODB_URL"))
+cluster = MongoClient(os.getenv("MONGODB_URI"))
 pref = cluster.DBOT.PREF
 bal = cluster.DBOT.BALANCE
 owners = cluster.DBOT.OWNERS
