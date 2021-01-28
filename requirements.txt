@@ -8,4 +8,4 @@ bs4
 lxml
 selenium
 gunicorn
-pymongo
+pymongo[srv]
