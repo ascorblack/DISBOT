@@ -7,5 +7,4 @@ requests
 bs4
 lxml
 selenium
-pymongo
 pymongo[srv]
