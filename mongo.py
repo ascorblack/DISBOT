@@ -1,8 +1,6 @@
 from pymongo import MongoClient
-import os
 
-
-cluster = MongoClient(os.environ.get("MONGODB_URI", 'mongodb://localhost/DBOT'))
+cluster = MongoClient("mongodb+srv://dbdbot:752113crjhgc@dbot.xvrkg.mongodb.net/DBOT?retryWrites=true&w=majority")
 pref = cluster.DBOT.PREF
 bal = cluster.DBOT.BALANCE
 owners = cluster.DBOT.OWNERS
