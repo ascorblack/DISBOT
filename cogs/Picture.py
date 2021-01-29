@@ -164,5 +164,17 @@ class Picture(commands.Cog):
             await ctx.send(output)
 
 
+    @rbomb.error
+    async def rbomb_error(self, ctx, error):
+        if isinstance(error, commands.CommandInvokeError):
+            emb = discord.Embed(description=f':no_entry_sign: При поиске произошла ошибка!\nПопробуйте ввести другой тэг.', color = discord.Colour.red())
+            await ctx.send(embed=emb)
+    @r34.error
+    async def r34_error(self, ctx, error):
+        if isinstance(error, commands.CommandInvokeError):
+            emb = discord.Embed(description=f':no_entry_sign: При поиске произошла ошибка!\nПопробуйте ввести другой тэг.', color = discord.Colour.red())
+            await ctx.send(embed=emb)
+
+
 def setup(bot):
     bot.add_cog(Picture(bot))

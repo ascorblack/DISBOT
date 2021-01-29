@@ -106,26 +106,26 @@ class Events(commands.Cog):
                 if self.bal.count_documents({"GuildID": guild.id, "MemberID": member.id}) == 0:
                     self.bal.insert_one({"GuildID": guild.id, "GuildName": guild.name, "MemberID": member.id, "MemberName": str(member), "Balance": 0})
 
-#    @commands.Cog.listener()
-#    async def on_command_error(self, ctx, error):
-#        if isinstance(error, commands.MissingPermissions):
-#            emb = discord.Embed(description=f":no_entry_sign: **{ctx.author}** У тебя нет прав администратора для использования команды **{ctx.command}**", color=discord.Colour.red())
-#            await ctx.send(embed=emb)
-#        if isinstance(error, commands.NotOwner):
-#            emb = discord.Embed(description=f":no_entry_sign: **{ctx.author}** Тебя нет в списке Owners!", color=discord.Colour.red())
-#            await ctx.send(embed=emb)
-#        if isinstance(error, commands.NSFWChannelRequired):
-#            emb = discord.Embed(description=f':no_entry_sign: Канал **{ctx.channel}** не является NSFW!', color = discord.Colour.red())
-#            await ctx.send(embed=emb)
-#        if isinstance(error, commands.MissingRequiredArgument) or isinstance(error, commands.BadArgument):
-#            pref = await get_prefixes(ctx)
-#            emb = discord.Embed(description=f':no_entry_sign: Неверный синтаксис комманды!\n`{pref}{ctx.command.help}`', color = discord.Colour.red())
-#            await ctx.send(embed=emb)
-#        if isinstance(error, commands.CommandInvokeError):
-#            if not str(ctx.command) in ["emoinfo", "poltest"]:
-#                pref = await get_prefixes(ctx)
-#                emb = discord.Embed(description=f':no_entry_sign: Неверный синтаксис комманды!\n`{pref}{ctx.command.help}`', color = discord.Colour.red())
-#                await ctx.send(embed=emb)
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            emb = discord.Embed(description=f":no_entry_sign: **{ctx.author}** У тебя нет прав администратора для использования команды **{ctx.command}**", color=discord.Colour.red())
+            await ctx.send(embed=emb)
+        if isinstance(error, commands.NotOwner):
+            emb = discord.Embed(description=f":no_entry_sign: **{ctx.author}** Тебя нет в списке Owners!", color=discord.Colour.red())
+            await ctx.send(embed=emb)
+        if isinstance(error, commands.NSFWChannelRequired):
+            emb = discord.Embed(description=f':no_entry_sign: Канал **{ctx.channel}** не является NSFW!', color = discord.Colour.red())
+            await ctx.send(embed=emb)
+        if isinstance(error, commands.MissingRequiredArgument) or isinstance(error, commands.BadArgument):
+            pref = await get_prefixes(ctx)
+            emb = discord.Embed(description=f':no_entry_sign: Неверный синтаксис комманды!\n`{pref}{ctx.command.help}`', color = discord.Colour.red())
+            await ctx.send(embed=emb)
+        if isinstance(error, commands.CommandInvokeError):
+            if not str(ctx.command) in ["emoinfo", "poltest", "r34", "rbomb"]:
+                pref = await get_prefixes(ctx)
+                emb = discord.Embed(description=f':no_entry_sign: Неверный синтаксис комманды!\n`{pref}{ctx.command.help}`', color = discord.Colour.red())
+                await ctx.send(embed=emb)
 
 
 
