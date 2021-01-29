@@ -93,6 +93,7 @@ class Picture(commands.Cog):
     @commands.command(help = 'rbomb <tags>\nSearch on https://rule34.xxx/ and output 5 results')
     @commands.is_nsfw()
     async def rbomb(self, ctx, *, tag = None):
+        check = []
         output = ''
         i = 0
         count = 5
@@ -112,9 +113,11 @@ class Picture(commands.Cog):
             a = []
             for img in soup.find_all('a', id=True, href=True, limit=60):
                 a.append(img['href'])
-            num = len(a)
+            num = len(a) - 1
             while i < count:
                 ran = random.randint(1, num)
+                print(ran)
+                print(check)
                 sit = f'https://rule34.xxx/{a[ran]}'
                 try:
                     root = requests.get(sit)
@@ -122,15 +125,36 @@ class Picture(commands.Cog):
                     out = []
                     for imag in soup.find_all('img', alt=True, src=True, id=True):
                         out.append(imag['src'])
-                    output += f'{out[0]}\n'
+                    if i > 0:
+                        if not str(out[0]) in check:
+                            check.append(str(out[0]))
+                            output += f'{out[0]}\n'
+                            i += 1
+                            print(f'{i} 5')
+                        else:
+                            pass
+                    else:
+                        output += f'{out[0]}\n'
+                        check.append(str(out[0]))
+                        i += 1
                 except:
                     root = requests.get(sit)
                     soup = BeautifulSoup(root.content, 'lxml')
                     out = []
                     for imag in soup.find_all('source', src=True, type=True):
                         out.append(imag['src'])
-                    output += f'{out[0]}\n'
-                i += 1
+                    if i > 0:
+                        if not str(out[0]) in check:
+                            check.append(str(out[0]))
+                            output += f'{out[0]}\n'
+                            i += 1
+                            print(f'{i} 5')
+                        else:
+                            pass
+                    else:
+                        output += f'{out[0]}\n'
+                        check.append(str(out[0]))
+                        i += 1
             await ctx.send(output)
         except:
             url = f'https://rule34.xxx/index.php?page=post&s=list&tags={tag}'
@@ -139,7 +163,7 @@ class Picture(commands.Cog):
             a = []
             for img in soup.find_all('a', id=True, href=True):
                 a.append(img['href'])
-            num = len(a)
+            num = len(a) - 1
             h = count
             if num <= count:
                 h = num
@@ -152,15 +176,36 @@ class Picture(commands.Cog):
                     out = []
                     for imag in soup.find_all('img', alt=True, src=True, id=True):
                         out.append(imag['src'])
-                    output += f'{out[0]}\n'
+                    if i > 0:
+                        if not str(out[0]) in check:
+                            check.append(str(out[0]))
+                            output += f'{out[0]}\n'
+                            i += 1
+                            print(f'{i} 5')
+                        else:
+                            pass
+                    else:
+                        output += f'{out[0]}\n'
+                        check.append(str(out[0]))
+                        i += 1
                 except:
                     root = requests.get(sit)
                     soup = BeautifulSoup(root.content, 'lxml')
                     out = []
                     for imag in soup.find_all('source', src=True, type=True):
                         out.append(imag['src'])
-                    output += f'{out[0]}\n'
-                i += 1
+                    if i > 0:
+                        if not str(out[0]) in check:
+                            check.append(str(out[0]))
+                            output += f'{out[0]}\n'
+                            i += 1
+                            print(f'{i} 5')
+                        else:
+                            pass
+                    else:
+                        output += f'{out[0]}\n'
+                        check.append(str(out[0]))
+                        i += 1
             await ctx.send(output)
 
 
