@@ -92,11 +92,10 @@ class Picture(commands.Cog):
                 await ctx.send(out[0])
     @commands.command(help = 'rbomb <count(max 10)> <tags>\nSearch on https://rule34.xxx/')
     @commands.is_nsfw()
-    async def rbomb(self, ctx, count: int, *, tag = None):
+    async def rbomb(self, ctx, *, tag = None):
         output = ''
         i = 0
-        if count > 10:
-            count = 10
+        count = 5
         urls = f'https://rule34.xxx/index.php?page=post&s=list&tags={tag}'
         ros = requests.get(urls)
         soup = BeautifulSoup(ros.content, 'lxml')
