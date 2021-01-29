@@ -90,7 +90,7 @@ class Picture(commands.Cog):
                 for imag in soup.find_all('source', src=True, type=True):
                     out.append(imag['src'])
                 await ctx.send(out[0])
-    @commands.command(help = 'rbomb <count(max 10)> <tags>\nSearch on https://rule34.xxx/')
+    @commands.command(help = 'rbomb <tags>\nSearch on https://rule34.xxx/ and output 5 results')
     @commands.is_nsfw()
     async def rbomb(self, ctx, *, tag = None):
         output = ''
