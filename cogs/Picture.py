@@ -93,6 +93,7 @@ class Picture(commands.Cog):
     @commands.command(help = 'rbomb <count(max 10)> <tags>\nSearch on https://rule34.xxx/')
     @commands.is_nsfw()
     async def rbomb(self, ctx, count: int, *, tag = None):
+        output = ''
         i = 0
         if count > 10:
             count = 10
@@ -122,15 +123,16 @@ class Picture(commands.Cog):
                     out = []
                     for imag in soup.find_all('img', alt=True, src=True, id=True):
                         out.append(imag['src'])
-                    await ctx.send(out[0])
+                    output += f'{out[0]}\n'
                 except:
                     root = requests.get(sit)
                     soup = BeautifulSoup(root.content, 'lxml')
                     out = []
                     for imag in soup.find_all('source', src=True, type=True):
                         out.append(imag['src'])
-                    await ctx.send(f'{out[0]}')
+                    output += f'{out[0]}\n'
                 i += 1
+            await ctx.send(output)
         except:
             url = f'https://rule34.xxx/index.php?page=post&s=list&tags={tag}'
             rs = requests.get(url)
@@ -151,16 +153,16 @@ class Picture(commands.Cog):
                     out = []
                     for imag in soup.find_all('img', alt=True, src=True, id=True):
                         out.append(imag['src'])
-                    await ctx.send(out[0])
+                    output += f'{out[0]}\n'
                 except:
                     root = requests.get(sit)
                     soup = BeautifulSoup(root.content, 'lxml')
                     out = []
                     for imag in soup.find_all('source', src=True, type=True):
                         out.append(imag['src'])
-                    await ctx.send(out[0])
+                    output += f'{out[0]}\n'
                 i += 1
-
+            await ctx.send(output)
 
 
 def setup(bot):
