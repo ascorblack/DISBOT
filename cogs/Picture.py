@@ -116,8 +116,6 @@ class Picture(commands.Cog):
             num = len(a) - 1
             while i < count:
                 ran = random.randint(1, num)
-                print(ran)
-                print(check)
                 sit = f'https://rule34.xxx/{a[ran]}'
                 try:
                     root = requests.get(sit)
@@ -130,7 +128,6 @@ class Picture(commands.Cog):
                             check.append(str(out[0]))
                             output += f'{out[0]}\n'
                             i += 1
-                            print(f'{i} 5')
                         else:
                             pass
                     else:
@@ -148,7 +145,6 @@ class Picture(commands.Cog):
                             check.append(str(out[0]))
                             output += f'{out[0]}\n'
                             i += 1
-                            print(f'{i} 5')
                         else:
                             pass
                     else:
@@ -181,7 +177,6 @@ class Picture(commands.Cog):
                             check.append(str(out[0]))
                             output += f'{out[0]}\n'
                             i += 1
-                            print(f'{i} 5')
                         else:
                             pass
                     else:
@@ -199,7 +194,6 @@ class Picture(commands.Cog):
                             check.append(str(out[0]))
                             output += f'{out[0]}\n'
                             i += 1
-                            print(f'{i} 5')
                         else:
                             pass
                     else:
