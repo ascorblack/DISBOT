@@ -12,14 +12,17 @@ async def get_last_news(tag):
     browser.get(f'https://panorama.pub/{tag}')
 
     html = browser.page_source
+    print(html)
+    try:
+        soup = BeautifulSoup(html, 'lxml')
 
-    soup = BeautifulSoup(html, 'lxml')
-
-    block_search = soup.find('div', class_='news big-previews two-in-row')
-    last_new = block_search.find('a', href=True, class_=True)
-    url_last_new = f'https://panorama.pub{last_new["href"]}'
-    print(url_last_new)
-    return url_last_new
+        block_search = soup.find('div', class_='news big-previews two-in-row')
+        last_new = block_search.find('a', href=True, class_=True)
+        url_last_new = f'https://panorama.pub{last_new["href"]}'
+        print(url_last_new)
+        return url_last_new
+    except:
+        return "error"
 
 
 async def parse_panorama():
