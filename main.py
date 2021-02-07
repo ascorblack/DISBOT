@@ -34,6 +34,8 @@ for filename in os.listdir("./cogs"):
         bot.coglist.append(filename[:-3])
 if bot.coglist.count("Events") == 1:
     bot.coglist.remove('Events')
+if bot.coglist.count("Post_news") == 1:
+    bot.coglist.remove('Post_news')
 print(fil)
 
 bot.run(settings['TOKEN'])

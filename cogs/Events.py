@@ -25,14 +25,20 @@ class Events(commands.Cog):
         self.ecoemoji = ecoemoji
         self.welcch = welcch
         self.exitch = exitch
+        self.newschan = newschan
+        self.lastnews = lastnews
+
 
     def update_db(self):
-        if self.owners.find({"MemberID": 263708575241601024}) == None:
+        if self.owners.find({"MemberID": 263708575241601024}) is None:
             self.owners.insert_one({"MemberID": 263708575241601024, "Owner": True})
+        for tag in ['politics', 'society', 'science', 'economics']:
+            if self.lastnews.find_one({"Category": tag}) is None:
+                self.lastnews.insert_one({"Category": tag, "LastPost": None})
         for guild in self.bot.guilds:
-            if self.ecoemoji.find_one({"GuildID": guild.id}) == None:
+            if self.ecoemoji.find_one({"GuildID": guild.id}) is None:
                 self.ecoemoji.insert_one({"GuildID": guild.id, "Emoji": ":dollar:"})
-            if self.pref.find_one({"GuildID": guild.id}) == None:
+            if self.pref.find_one({"GuildID": guild.id}) is None:
                 self.pref.insert_one({"GuildID": guild.id, "Prefix": "-"})
             if self.welcch.count_documents({"GuildID": guild.id}) == 0:
                 self.welcch.insert_one({"GuildID": guild.id, "Message": "приветствуем вас на нашем сервере!", "ChannelID": 0})

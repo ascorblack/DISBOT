@@ -18,6 +18,8 @@ class Admin(commands.Cog):
         self.ecoemoji = ecoemoji
         self.welcch = welcch
         self.exitch = exitch
+        self.newschan = newschan
+        
 
     @commands.command(pass_context=True)
     @commands.is_owner()
@@ -433,6 +435,31 @@ class Admin(commands.Cog):
             msg += f'{own}\n'
         emb = discord.Embed(description=msg)
         await ctx.send(embed=emb)
+
+
+# Установить канал для новостей
+    @commands.command(aliases=['setnewsch', "newsetchan"])
+    @has_permissions(administrator=True)
+    async def news_set_channel(self, ctx, channel: int):
+        found = False
+        for chann in ctx.guild.text_channels:
+            channi = chann.id
+            if channel == channi:
+                check = self.newschan.find_one({"GuildID": ctx.guild.id})['ChannelID']
+                if check == 0 or check != channel:
+                    self.newschan.update_one({"GuildID": ctx.guild.id}, {"$set": {"ChannelID": channel}})
+                    emb = discord.Embed(description=f'В качестве канала, для постинга новостей вы установили **{chann.name}**', color=await hid_emb())
+                    await ctx.send(embed=emb)
+                elif check != 0 and check == channel:
+                    emb = discord.Embed(description=f':no_entry_sign: Канал **{chann}** уже назначен для новостей!')
+                    await ctx.send(embed=emb)
+                return
+            else:
+                pass
+        if not found:
+            emb = discord.Embed(description=f':no_entry_sign: Введите корректный **текстовый** канал!')
+            await ctx.send(embed=emb)
+
 
 
 def setup(bot):
