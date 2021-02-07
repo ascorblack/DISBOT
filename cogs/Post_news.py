@@ -27,7 +27,7 @@ class Post_news(commands.Cog):
                 for news in last_new:
                     await channel.send(news)
 
-    @tasks.loop(seconds=600)
+    @tasks.loop(seconds=30)
     async def reg_loop(self):
         async with self.lock:
             await self.loop_post_news()
