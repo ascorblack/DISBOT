@@ -1,12 +1,17 @@
 from bs4 import BeautifulSoup
 import requests
 import lxml
+import random
+import asyncio
 from mongo import lastnews
 
 
 async def get_last_news(tag):
     root = requests.get(f'https://panorama.pub/{tag}')
     soup = BeautifulSoup(root.content, 'lxml')
+
+    cd = random.randint(0, 1)
+    await asyncio.sleep(cd)
 
     block_search = soup.find('div', class_='news big-previews two-in-row')
     last_new = block_search.find('a', href=True, class_=True)
