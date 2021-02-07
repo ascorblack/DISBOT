@@ -5,6 +5,7 @@ import random
 import asyncio
 from selenium import webdriver
 from mongo import lastnews
+import os
 
 
 async def get_last_news(tag):
@@ -22,12 +23,14 @@ async def get_last_news(tag):
 
 
 async def parse_panorama():
-    options = webdriver.ChromeOptions()
-    options.add_argument("start-maximized")
-    options.add_argument("window-size=1920,1440")
-    options.headless = True
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("window-size=1920,1440")
     global browser
-    browser = webdriver.Chrome(executable_path="C:/Users/sanch/Desktop/bot/selenium/path/chromedriver.exe",options=options)
+    browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
     list_news = []
     for tag in ['politics', 'society', 'science', 'economics']:
         lastnew = await get_last_news(tag)
