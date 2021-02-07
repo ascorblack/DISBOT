@@ -28,7 +28,7 @@ class Post_news(commands.Cog):
                     file = discord.File(open('resulttest/lastpostpanorama.png', 'rb'))
                     await channel.send(file=file)
 
-    @tasks.loop(seconds=30)
+    @tasks.loop(seconds=1200)
     async def reg_loop(self):
         async with self.lock:
             await self.loop_post_news()
