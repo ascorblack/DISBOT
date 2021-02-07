@@ -13,10 +13,14 @@ async def get_last_news(tag):
     cd = random.randint(0, 1)
     await asyncio.sleep(cd)
 
-    block_search = soup.find('div', class_='news big-previews two-in-row')
-    last_new = block_search.find('a', href=True, class_=True)
-    url_last_new = f'https://panorama.pub{last_new["href"]}'
-    return url_last_new
+    try:
+        block_search = soup.find('div', class_='news big-previews two-in-row')
+        last_new = block_search.find('a', href=True, class_=True)
+        url_last_new = f'https://panorama.pub{last_new["href"]}'
+        return url_last_new
+    except:
+        print(soup.content)
+        return 'error'
 
 
 async def parse_panorama():
