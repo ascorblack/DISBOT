@@ -17,7 +17,7 @@ async def get_last_post():
     browser.get(url)
 
     i = 0
-    for res in browser.find_elements_by_class_name("wall_text"):
+    for res in browser.find_elements_by_class_name("wall_text"): 
         i += 1
         if i == 3:
             for down in browser.find_elements_by_class_name("replies"):
@@ -31,3 +31,4 @@ async def get_last_post():
                         return True
                     else:
                         return False
+    browser.close()
