@@ -29,6 +29,7 @@ async def get_last_post():
                         lastnews.update_one({"Check": "PanoramaVK"}, {"$set": {"LastPost": str(checktext)}})
                         res.screenshot('resulttest/lastpostpanorama.png')
                         return True
+                        browser.close()
                     else:
                         return False
-    browser.close()
+                        browser.close()
