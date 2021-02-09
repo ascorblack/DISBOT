@@ -29,7 +29,8 @@ async def get_last_post():
             return False
     except:
         text = f'{data["response"]["items"][1]["text"]}\n\n'
-        photo_link = f'{data["response"]["items"][1]["attachments"][0]["photo"]["sizes"][8]["url"]}'
+        max_size = len(data["response"]["items"][1]["attachments"][0]["photo"]["sizes"]) - 1
+        photo_link = f'{data["response"]["items"][1]["attachments"][0]["photo"]["sizes"][max_size]["url"]}'
         if str(checklast) != str(text) or checklast is None:
             lastnews.update_one({"Check": "PanoramaVK"}, {"$set": {"LastPost": str(text)}})
             return text, photo_link
