@@ -41,26 +41,26 @@ class Admin(commands.Cog):
         while i < int(k):
             await ctx.send(text)
             i += 1
-    @commands.command(aliases=["нюк"], hidden = True)
-    @commands.is_owner()
-    async def nuke(self, ctx):
-        emb = discord.Embed(description=f'{ctx.author} Ты уверен?', color = discord.Colour.red())
-        warn = await ctx.send(embed=emb)
-        emoji = '🔛'
-        await warn.add_reaction(emoji)
-        def check(reaction, user):
-            return str(reaction.emoji) == emoji and user.id == ctx.author.id
-        try:
-            reaction, user = await self.bot.wait_for("reaction_add", timeout=3, check=check)
-            emb = discord.Embed(description=f'{ctx.author} начал полное уничтожение сервера!', color = discord.Colour.red())
-            await warn.edit(embed=emb)
-            for member in ctx.guild:
-                if not member.bot:
-                    if member != ctx.author:
-                        await ctx.guild.ban(member, reason='😈 СЕРВЕР ЗАХВАЧЕН!')
-        except asyncio.TimeoutError:
-            emb = discord.Embed(description=f'{ctx.author} не успел активировать бомбу', color = discord.Colour.green())
-            await warn.edit(embed=emb)
+    # @commands.command(aliases=["нюк"], hidden = True)
+    # @commands.is_owner()
+    # async def nuke(self, ctx):
+    #     emb = discord.Embed(description=f'{ctx.author} Ты уверен?', color = discord.Colour.red())
+    #     warn = await ctx.send(embed=emb)
+    #     emoji = '🔛'
+    #     await warn.add_reaction(emoji)
+    #     def check(reaction, user):
+    #         return str(reaction.emoji) == emoji and user.id == ctx.author.id
+    #     try:
+    #         reaction, user = await self.bot.wait_for("reaction_add", timeout=3, check=check)
+    #         emb = discord.Embed(description=f'{ctx.author} начал полное уничтожение сервера!', color = discord.Colour.red())
+    #         await warn.edit(embed=emb)
+    #         for member in ctx.guild:
+    #             if not member.bot:
+    #                 if member != ctx.author:
+    #                     await ctx.guild.ban(member, reason='😈 СЕРВЕР ЗАХВАЧЕН!')
+    #     except asyncio.TimeoutError:
+    #         emb = discord.Embed(description=f'{ctx.author} не успел активировать бомбу', color = discord.Colour.green())
+    #         await warn.edit(embed=emb)
     @commands.command(help = 'say <text>')
     @commands.is_owner()
     async def say(self, ctx, *, text):
