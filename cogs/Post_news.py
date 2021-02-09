@@ -36,7 +36,7 @@ class Post_news(commands.Cog):
                         emb.set_image(url=last_new[1])
                         await channel.send(embed=emb)
 
-    @tasks.loop(seconds=30)
+    @tasks.loop(seconds=800)
     async def reg_loop(self):
         async with self.lock:
             await self.loop_post_news()
