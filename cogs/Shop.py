@@ -100,8 +100,8 @@ class Shop(commands.Cog):
                 await ctx.send(embed=emb)
         with open('cogs/data.json', 'w') as f:
             json.dump(buyi, f)
-    @commands.command(aliases=["transfer", "give"], help = 'give/trans <@member> <item-name> <quantity>')
-    async def trans(self, ctx, member: discord.Member, name = None, arg = 0):
+    @commands.command(aliases=["give"], help = 'give/trans <@member> <item-name> <quantity>')
+    async def transfer(self, ctx, member: discord.Member, name = None, arg = 0):
         money = await get_data()
         if arg <= 0:
             emb = discord.Embed(description=f'Вы не можете передать отрицательное/нулевое количество!')
