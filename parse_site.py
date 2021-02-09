@@ -1,35 +1,40 @@
-from selenium import webdriver
+import requests
+import json
 from mongo import lastnews
-import os
-
 
 async def get_last_post():
-    url = f'https://vk.com/ia_panorama'
+    access_token = 'fcfd642dfcfd642dfcfd642d22fc8b3d7fffcfdfcfd642d9cdf1a019291045e6b320489'
+    v = '5.126'
+    domain = 'ia_panorama'
 
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("window-size=1920,5000")
-    browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
+        'X-Requested-With': 'XMLHttpRequest'
+        }
 
-    browser.get(url)
 
-    i = 0
-    for res in browser.find_elements_by_class_name("wall_text"): 
-        i += 1
-        if i == 3:
-            for down in browser.find_elements_by_class_name("replies"):
-                i += 1
-                if i == 6:
-                    checktext = res.text
-                    checklast = lastnews.find_one({"Check": "PanoramaVK"})['LastPost']
-                    if str(checklast) != str(checktext) or checklast is None:
-                        lastnews.update_one({"Check": "PanoramaVK"}, {"$set": {"LastPost": str(checktext)}})
-                        res.screenshot('resulttest/lastpostpanorama.png')
-                        return True
-                        browser.close()
-                    else:
-                        return False
-                        browser.close()
+    get_parse = requests.get(f"https://api.vk.com/method/wall.get?access_token={access_token}&v={v}&domain={domain}", headers=headers)
+    data = json.loads(get_parse.content)
+
+    checklast = lastnews.find_one({"Check": "PanoramaVK"})['LastPost']
+    try:
+        publish = f'{data["response"]["items"][1]["attachments"][0]["link"]["caption"]}'
+        text = f'{data["response"]["items"][1]["attachments"][0]["link"]["title"]}'
+        news_link = f'{data["response"]["items"][1]["attachments"][0]["link"]["url"]}'
+        photo_link = f'{data["response"]["items"][1]["attachments"][0]["link"]["photo"]["sizes"][0]["url"]}'
+        if str(checklast) != str(text) or checklast is None:
+            lastnews.update_one({"Check": "PanoramaVK"}, {"$set": {"LastPost": str(text)}})
+            return publish, text, news_link, photo_link
+        else: 
+            return False
+    except:
+        text = f'{data["response"]["items"][1]["text"]}\n\n'
+        photo_link = f'{data["response"]["items"][1]["attachments"][0]["photo"]["sizes"][8]["url"]}'
+        if str(checklast) != str(text) or checklast is None:
+            lastnews.update_one({"Check": "PanoramaVK"}, {"$set": {"LastPost": str(text)}})
+            return text, photo_link
+        else:
+            return False
+
+
+
