@@ -25,17 +25,21 @@ async def get_last_post():
         if str(checklast) != str(text) or checklast is None:
             lastnews.update_one({"Check": "PanoramaVK"}, {"$set": {"LastPost": str(text)}})
             return publish, text, news_link, photo_link
-        else: 
+        else:
             return False
     except:
-        text = f'{data["response"]["items"][1]["text"]}\n\n'
+        text = f'{data["response"]["items"][1]["text"]}'
         max_size = len(data["response"]["items"][1]["attachments"][0]["photo"]["sizes"]) - 1
-        photo_link = f'{data["response"]["items"][1]["attachments"][0]["photo"]["sizes"][max_size]["url"]}'
+        try:
+            i = 0
+            photo_link = []
+            for qu in data["response"]["items"][1]["attachments"]:
+                photo_link.append(f'{data["response"]["items"][1]["attachments"][i]["photo"]["sizes"][max_size]["url"]}')
+                i += 1
+        except KeyError:
+            photo_link = None
         if str(checklast) != str(text) or checklast is None:
             lastnews.update_one({"Check": "PanoramaVK"}, {"$set": {"LastPost": str(text)}})
             return text, photo_link
         else:
             return False
-
-
-
