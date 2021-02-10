@@ -72,9 +72,10 @@ class Poltest(commands.Cog):
                         try:
                             check = browser.find_element_by_id('banner')
                             await msg.delete()
-                            browser.find_element_by_id('banner').screenshot('resulttest/result.png')
-                            file = discord.File(open('resulttest/result.png', 'rb'))
+                            browser.find_element_by_id('banner').screenshot(f'resulttest/{ctx.author.id}.png')
+                            file = discord.File(open(f'resulttest/{ctx.author.id}.png', 'rb'))
                             await ctx.send(f'**{ctx.author.mention}** — ваш результат', file=file)
+                            os.remove(f'resulttest/{ctx.author.id}.png')
                             finish = True
                         except:
                             num = browser.find_element_by_id("question-number").text
