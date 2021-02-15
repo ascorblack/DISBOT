@@ -173,7 +173,20 @@ class Other(commands.Cog):
         resul = rest.find('td', align="right")
         emb = discord.Embed(description=f'{out[3:-1]} — {emoji} : `{resul.text}`\n{url}', color = await hid_emb())
         await ctx.send(embed=emb)
-
+    @commands.command(help="porfir <length (max 150)> <text>")
+    async def porfir(self, ctx, word: int, *, text: str):
+        url = "https://pelevin.gpt.dobro.ai/generate/"
+        request = json.dumps({"prompt": f"{text}", "length": word})
+        api = requests.post(url=url, data=request)
+        data = json.loads(api.text)
+        result = ''
+        num = 0
+        for i in data['replies']:
+            result += f"**{num+1}.** {text}{data['replies'][num]}\n—————————————————————\n"
+            num += 1
+        emb = discord.Embed(title=f"{ctx.author} — Ваш результат", description=f"\n{result}", color=discord.Colour.blue())
+        await ctx.send(embed=emb)
+        
 
     @emoinfo.error
     async def emoinfo_error(self, ctx, error):
