@@ -57,7 +57,7 @@ class Post_news(commands.Cog):
                     channel = self.bot.get_channel(check)
                     await channel.send(find)
 
-    @tasks.loop(seconds=30)
+    @tasks.loop(seconds=800)
     async def reg_loop(self):
         async with self.lock:
             await self.loop_post_news_panoramavk()
