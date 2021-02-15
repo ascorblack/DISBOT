@@ -179,10 +179,10 @@ class Other(commands.Cog):
         request = json.dumps({"prompt": f"{text}", "length": word})
         api = requests.post(url=url, data=request)
         data = json.loads(api.text)
-        result = ''
+        result = '———————————————————————————————\n'
         num = 0
         for i in data['replies']:
-            result += f"**{num+1}.** {text}{data['replies'][num]}\n—————————————————————\n"
+            result += f"**{num+1}.** {text}{data['replies'][num]}\n———————————————————————————————\n"
             num += 1
         emb = discord.Embed(title=f"{ctx.author} — Ваш результат", description=f"\n{result}", color=discord.Colour.blue())
         await ctx.send(embed=emb)
