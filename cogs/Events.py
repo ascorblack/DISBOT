@@ -32,9 +32,6 @@ class Events(commands.Cog):
     def update_db(self):
         if self.owners.find({"MemberID": 263708575241601024}) is None:
             self.owners.insert_one({"MemberID": 263708575241601024, "Owner": True})
-        for tag in ['politics', 'society', 'science', 'economics']:
-            if self.lastnews.find_one({"Category": tag}) is None:
-                self.lastnews.insert_one({"Category": tag, "LastPost": None})
         for guild in self.bot.guilds:
             if self.ecoemoji.find_one({"GuildID": guild.id}) is None:
                 self.ecoemoji.insert_one({"GuildID": guild.id, "Emoji": ":dollar:"})
